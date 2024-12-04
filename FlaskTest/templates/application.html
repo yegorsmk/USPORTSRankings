@@ -1,0 +1,194 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<script src="/static/scripts/sorttable.js"></script>
+
+<h2>{{ title }}</h2>
+<body>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ message }}</h3>
+            <form method="POST">
+                <h4>Results Season</h4>
+                <select name="TARGET_SEASON">
+                    <option value="2022-2023" selected="selected">2022-2023</option>
+                </select>
+                <br><br>
+
+                <h4>Target Gender</h4>
+                <select name="TARGET_GENDER">
+                    <option value="Both" selected="selected">Both</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                </select>
+                <br><br>
+
+                <h4>Target Grade</h4>
+                <select name="TARGET_GRADE">
+                    <option value="All" selected="selected">All</option>
+                    <option value="12">12</option>
+                    <option value="11">11</option>
+                    <option value="10">10</option>
+                    <option value="9">9</option>
+                    <option value="8">8</option>
+                </select>
+                <br><br>
+
+                <h4>Target League</h4>
+                <select name="TARGET_LEAGUE">
+                    <!-- <option value="All" selected="selected">All</option> -->
+                    <option value="SNC" selected="selected">SNC</option>
+                    <!-- <option value="USAS">USAS</option> -->
+                </select>
+                <br><br>
+
+                <h4>Target Province</h4>
+                <select name="TARGET_PROVINCE">
+                    <option value="All" selected="selected">All (needs to be All for USA)</option>
+                    <option value="AB">Alberta</option>
+                    <option value="BC">British Columbia</option>
+                    <option value="MB">Manitoba</option>
+                    <option value="NB">New Brunswick</option>
+                    <option value="NL">Newfoundland</option>
+                    <option value="NT">Northwest Territories</option>
+                    <option value="NS">Nova Scotia</option>
+                    <option value="NU">Nunavut</option>
+                    <option value="ON">Ontario</option>
+                    <option value="PE">Prince-Edward-Island</option>
+                    <option value="QC">Quebec</option>
+                    <option value="SK">Saskatchewan</option>
+                    <option value="YT">Yukon</option>
+                </select>
+                <br><br>
+
+                <h4>Target Cut</h4>
+                <select name="TARGET_CUT">
+                    <option value="USPORTS" selected="selected">USPORTS</option>
+                    <option value="NCAA_A">NCAA A</option>
+                    <option value="NCAA_B">NCAA B</option>
+                    <option value="NAIA">NAIA</option>
+                </select>
+                <br><br>
+
+                <h4>Best Percent</h4>
+                <select name="TOP_PERCENT">
+                    <option value="Faster" selected="selected">& Faster</option>
+                    <option value="-10">-10 %</option>
+                    <option value="-9">-9 %</option>
+                    <option value="-8">-8 %</option>
+                    <option value="-7">-7 %</option>
+                    <option value="-6">-6 %</option>
+                    <option value="-5">-5 %</option>
+                    <option value="-4">-4 %</option>
+                    <option value="-3">-3 %</option>
+                    <option value="-2">-2 %</option>
+                    <option value="-1">-1 %</option>
+                    <option value="0">0 % (made the cut)</option>
+                    <option value="1">1 %</option>
+                    <option value="2">2 %</option>
+                    <option value="3">3 %</option>
+                    <option value="4">4 %</option>
+                    <option value="5">5 %</option>
+                    <option value="6">6 %</option>
+                    <option value="7">7 %</option>
+                    <option value="8">8 %</option>
+                    <option value="9">9 %</option>
+                    <option value="10">10 %</option>
+                </select>
+                <br><br>
+
+                <h4>Worst Percent</h4>
+                <select name="BOTTOM_PERCENT">
+                    <option value="-10">-10 %</option>
+                    <option value="-9">-9 %</option>
+                    <option value="-8">-8 %</option>
+                    <option value="-7">-7 %</option>
+                    <option value="-6">-6 %</option>
+                    <option value="-5">-5 %</option>
+                    <option value="-4">-4 %</option>
+                    <option value="-3">-3 %</option>
+                    <option value="-2">-2 %</option>
+                    <option value="-1">-1 %</option>
+                    <option value="0">0 % (made the cut)</option>
+                    <option value="1">1 %</option>
+                    <option value="2">2 %</option>
+                    <option value="3">3 %</option>
+                    <option value="4">4 %</option>
+                    <option value="5">5 %</option>
+                    <option value="6">6 %</option>
+                    <option value="7">7 %</option>
+                    <option value="8">8 %</option>
+                    <option value="9">9 %</option>
+                    <option value="10">10 %</option>
+                    <option value="Slower" selected="selected">& Slower</option>
+                </select>
+                <br><br>
+
+                <h4>Mandatory Event</h4>
+                <select name="MANDATORY_EVENT">
+                    <option value="None" selected="selected">None</option>
+                    <option value="50 Free">50 Free</option>
+                    <option value="100 Free">100 Free</option>
+                    <option value="200 Free">200 Free</option>
+                    <option value="400 Free">400 Free</option>
+                    <option value="500 Free">500 Free</option>
+                    <option value="800 Free">800 Free</option>
+                    <option value="1000 Free">1000 Free</option>
+                    <option value="1500 Free">1500 Free</option>
+                    <option value="1650 Free">1650 Free</option>
+                    <option value="50 Back">50 Back</option>
+                    <option value="100 Back">100 Back</option>
+                    <option value="200 Back">200 Back</option>
+                    <option value="50 Breast">50 Breast</option>
+                    <option value="100 Breast">100 Breast</option>
+                    <option value="200 Breast">200 Breast</option>
+                    <option value="50 Fly">50 Fly</option>
+                    <option value="100 Fly">100 Fly</option>
+                    <option value="200 Fly">200 Fly</option>
+                    <option value="100 I.Medley">100 IM</option>
+                    <option value="200 I.Medley">200 IM</option>
+                    <option value="400 I.Medley">400 IM</option>
+                </select>
+                <br><br>
+
+                <h4>Mandatory Event Minimum Percent</h4>
+                <select name="MANDATORY_PERCENT">
+                    <option value="-10">-10 %</option>
+                    <option value="-9">-9 %</option>
+                    <option value="-8">-8 %</option>
+                    <option value="-7">-7 %</option>
+                    <option value="-6">-6 %</option>
+                    <option value="-5">-5 %</option>
+                    <option value="-4">-4 %</option>
+                    <option value="-3">-3 %</option>
+                    <option value="-2">-2 %</option>
+                    <option value="-1">-1 %</option>
+                    <option value="0">0 % (made the cut)</option>
+                    <option value="1">1 %</option>
+                    <option value="2">2 %</option>
+                    <option value="3">3 %</option>
+                    <option value="4">4 %</option>
+                    <option value="5">5 %</option>
+                    <option value="6">6 %</option>
+                    <option value="7">7 %</option>
+                    <option value="8">8 %</option>
+                    <option value="9">9 %</option>
+                    <option value="10">10 %</option>
+                    <option value="None" selected="selected">None</option>
+                </select>
+                <br><br>
+
+                <h4>Export Type</h4>
+                <select name="EXPORT_TYPE">
+                    <option value="Web" selected="selected">Web</option>
+                    <option value="CSV">CSV</option>
+                    <option value="Excel">Excel</option>
+                </select>
+                <br><br>
+
+                <input type="submit" value="Generate">
+            </form>
+    </div>
+</div>
+</body>
+{% endblock %}

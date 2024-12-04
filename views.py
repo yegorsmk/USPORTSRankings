@@ -1,0 +1,126 @@
+"""
+Routes and views for the flask application.
+"""
+
+from datetime import datetime
+from flask import flash
+from flask import render_template
+from flask import request
+from flask import send_from_directory
+from flask import redirect
+from flask import url_for
+from FlaskTest import app
+import os
+import pandas as pd
+import numpy as np
+import hashlib
+import signal
+import csv
+
+import USPORTSDataManager
+
+from datetime import date
+today = date.today()
+
+@app.route('/')
+def home():
+    """Renders the home page."""
+    return render_template(
+        'index.html',
+        title='Home',
+        year=datetime.now().year
+    )
+
+@app.route('/power', methods=['GET', 'POST'])
+def power():
+    """Handles both rendering and form submission for the Individual Rankings page."""
+    if request.method == 'POST':
+        TARGET_GENDER = request.form['TARGET_GENDER']
+        TARGET_EVENT = request.form['TARGET_EVENT']
+        TARGET_COURSE = "Short Course (25m)"
+
+        # Call ProvideIndividualRankings to get filtered rankings
+        power_rankings = USPORTSDataManager.ProvidePowerRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
+
+        # Convert rankings to a pandas DataFrame for better presentation
+        rankings_df = pd.DataFrame(power_rankings, columns=['Place', 'Name', 'Team', 'Time', 'Score'])
+
+        # Convert the DataFrame to HTML
+        rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
+
+        return render_template(
+            'power.html',
+            title='Unofficial U SPORTS Power Rankings as of ' + today.strftime("%B %d, %Y"),
+            year=datetime.now().year,
+            message=f"{TARGET_GENDER}'s {TARGET_EVENT} {TARGET_COURSE}",
+            data=rankings_html  # Pass the table as HTML to the template
+        )
+    else:  # GET request
+        return render_template(
+            'power.html',
+            title='Unofficial U SPORTS Power Rankings as of ' + today.strftime("%B %d, %Y"),
+            year=datetime.now().year,
+            message='Please select a Gender, Event, and click Get Rankings.',
+            data=""
+        )
+
+@app.route('/psych', methods=['GET', 'POST'])
+def psych():
+    """Handles both rendering and form submission for the Psych Rankings page."""
+    if request.method == 'POST':
+        TARGET_GENDER = request.form['TARGET_GENDER']
+        TARGET_EVENT = request.form['TARGET_EVENT']
+
+        if TARGET_EVENT == "Distance":
+            if TARGET_GENDER == "Men":
+                TARGET_EVENT = "1500m Freestyle"
+            elif TARGET_GENDER == "Women":
+                TARGET_EVENT = "800m Freestyle"
+                
+        TARGET_COURSE = "Short Course (25m)"
+
+        # Call ProvideIndividualRankings to get filtered rankings
+        psych_rankings = USPORTSDataManager.ProvidePsychRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
+
+        # Convert rankings to a pandas DataFrame for better presentation
+        rankings_df = pd.DataFrame(psych_rankings, columns=['Place', 'Name', 'Team', 'Time', 'Score'])
+
+        # Convert the DataFrame to HTML
+        rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
+
+        return render_template(
+            'psych.html',
+            title='Unofficial U SPORTS Psych Rankings as of ' + today.strftime("%B %d, %Y"),
+            year=datetime.now().year,
+            message=f"{TARGET_GENDER}'s {TARGET_EVENT} {TARGET_COURSE}",
+            data=rankings_html  # Pass the table as HTML to the template
+        )
+    else:  # GET request
+        return render_template(
+            'psych.html',
+            title='Unofficial U SPORTS Psych Rankings as of ' + today.strftime("%B %d, %Y"),
+            year=datetime.now().year,
+            message='Please select a Gender, Event, and click Get Rankings.',
+            data=""
+        )
+
+@app.route('/team')
+def team():
+    """Renders the Team Rankings report."""
+    womens_team_rankings, mens_team_rankings = USPORTSDataManager.ProvideTeamRankings()
+
+    # Convert to pandas DataFrame
+    womens_df = pd.DataFrame(womens_team_rankings, columns=['Rank', 'Team', 'Score'])
+    mens_df = pd.DataFrame(mens_team_rankings, columns=['Rank', 'Team', 'Score'])
+
+    # Convert DataFrame to HTML
+    womens_html = womens_df.to_html(classes='table table-striped', index=False)
+    mens_html = mens_df.to_html(classes='table table-striped', index=False)
+
+    return render_template(
+        'team.html',
+        title='Unofficial U SPORTS Team Rankings as of ' + today.strftime("%B %d, %Y"),
+        year=datetime.now().year,
+        womens_team_table=womens_html,
+        mens_team_table=mens_html
+    )

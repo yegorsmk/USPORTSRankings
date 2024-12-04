@@ -1,0 +1,24 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<script src="/static/scripts/sorttable.js"></script>
+
+<h2>{{ title }}</h2>
+<body>
+    <p>The following scores take <b>U SPORTS Entry Limits</b> (4 events per swimmer, 1 relay per team) into account.</p>
+    <p>For a full breakdown by each individual event, please see the <a href="psych">Psych Rankings</a>.</p>
+    <hr>
+    <html>
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Women's Team Rankings</h3>
+                {{ womens_team_table|safe }}
+            </div>
+            <div class="col-md-6">
+                <h3>Men's Team Rankings</h3>
+                {{ mens_team_table|safe }}
+            </div>
+        </div>
+    </html>
+</body>
+{% endblock %}

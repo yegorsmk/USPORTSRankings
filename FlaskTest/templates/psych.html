@@ -1,0 +1,67 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<script src="/static/scripts/sorttable.js"></script>
+
+<h2>{{ title }}</h2>
+<body>
+
+    <body>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>{{ message }}</h3>
+                <p>The following scores take <b>U SPORTS Entry Limits</b> (4 events per swimmer, 1 relay per team) into account.</p>
+                <p>For a reranking using <b>every swim</b>, please see the <a href="power">Power Rankings</a>.</p>
+                <hr>
+                <form method="POST">
+                    <div class="col-md-1">
+                        <h4>Gender</h4>
+                        <select name="TARGET_GENDER">
+                            <option value="Women">Female</option>
+                            <option value="Men">Male</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <h4>Event</h4>
+                        <select name="TARGET_EVENT">
+                            <option value="50m Freestyle">50 Free</option>
+                            <option value="100m Freestyle">100 Free</option>
+                            <option value="200m Freestyle">200 Free</option>
+                            <option value="400m Freestyle">400 Free</option>
+                            <option value="Distance">800/1500 Free</option>
+                            <option value="50m Backstroke">50 Back</option>
+                            <option value="100m Backstroke">100 Back</option>
+                            <option value="200m Backstroke">200 Back</option>
+                            <option value="50m Breaststroke">50 Breast</option>
+                            <option value="100m Breaststroke">100 Breast</option>
+                            <option value="200m Breaststroke">200 Breast</option>
+                            <option value="50m Butterfly">50 Fly</option>
+                            <option value="100m Butterfly">100 Fly</option>
+                            <option value="200m Butterfly">200 Fly</option>
+                            <option value="200m Medley">200 IM</option>
+                            <option value="400m Medley">400 IM</option>
+                            <option value="4 x 100m Freestyle">4x100 Free</option>
+                            <option value="4 x 200m Freestyle">4x200 Free</option>
+                            <option value="4 x 100m Medley">4x100 Medley</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <h4>Export Type</h4>
+                        <select name="EXPORT_TYPE">
+                            <option value="Web" selected="selected">Web</option>
+                            <!--<option value="CSV">CSV</option>
+                            <option value="Excel">Excel</option>-->
+                        </select>
+                    </div>
+                    <br><br>
+                    <input type="submit" value="Get Rankings">
+                </form>
+            </div>
+        </div>
+    </body>
+
+    <html>
+    {{ data|safe }}
+    </html>
+</body>
+{% endblock %}
