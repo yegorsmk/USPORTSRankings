@@ -568,10 +568,12 @@ for individual_athlete in individual_athletes:
             for row in event_scoring_df:
                 swimmer_name = row[4]
                 if swimmer_name == individual_athlete:
-                    old_score = float(row[7])
+                    old_score = float(row[8])
+                    event_name = row[1]
                     if (old_score >= highest_score_so_far and row not in selected_rows):
-                        highest_score_so_far = old_score
-                        highest_event_so_far = row
+                        if ("Lap" not in event_name or ("Lap" in event_name and highest_event_so_far == None)):
+                            highest_score_so_far = old_score
+                            highest_event_so_far = row
             selected_rows.append(highest_event_so_far)
     else:
         # Grab them All

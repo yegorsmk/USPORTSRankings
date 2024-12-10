@@ -8,7 +8,6 @@ MENS_TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "mens_team_scoring_db.csv"
 WOMENS_TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "womens_team_scoring_db.csv"
 
 EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "event_scoring_db.csv"
-
 RESTRICTED_EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "restricted_event_scoring_db.csv"
 
 ### CLASSES AND METHODS ###
@@ -109,7 +108,7 @@ def ProvidePsychRankings(gender, event, course):
         psych_rankings_final.append([
             row['New Place'],           # Use New Place
             row['Name'],
-            row['Team'],
+            row['Club'],
             formatted_time,            # Use the formatted time string,
             row['AQUA'],
             row['New Score']           # Use New Score
@@ -146,5 +145,81 @@ def ProvideTeamRankings():
         print(f"An error occurred while reading {MENS_TEAM_SCORING_DB_FILENAME}: {e}")
 
     return womens_team_rankings, mens_team_rankings
+
+def ProvideNameResults(name, course):
+    name_results_raw = []
+    name_results_final = []
+
+    try:
+        with open(EVENT_SCORING_DB_FILENAME, mode='r') as event_file:
+            csv_reader = csv.DictReader(event_file)  # Use DictReader for easier column-based filtering
+            for row in csv_reader:
+                # Filter rows based on the criteria
+                if (row['Name'] == name and
+                    row['Course'] == course):
+                    name_results_raw.append(row)
+    except FileNotFoundError:
+        print(f"Error: File {EVENT_SCORING_DB_FILENAME} not found.")
+    except Exception as e:
+        print(f"An error occurred while reading {EVENT_SCORING_DB_FILENAME}: {e}")
+
+    # Convert the filtered rows into a final list format (optional step for presentation)
+    for row in name_results_raw:
+        # Convert time using secToTime before appending to the final list
+        time_in_sec = float(row['Time'])  # Assuming 'Time' is in seconds
+        formatted_time = secToTime(time_in_sec)  # Format the time
+        
+        # Include the new rankings (New Place and New Score) from the restricted event scoring file
+        name_results_final.append([
+            row['Event'],
+            formatted_time,            # Use the formatted time string
+            row['AQUA'],
+            row['Place'],           # Use New Place
+            row['Score']           # Use New Score
+        ])
+
+    # Sort team_results_final by the Name column (index 3)
+    name_results_final.sort(key=lambda x: x[4])  # Sort by swimmer's scores
+    return name_results_final
+
+
+def ProvideTeamResults(team, course):
+    team_results_raw = []
+    team_results_final = []
+
+    try:
+        with open(RESTRICTED_EVENT_SCORING_DB_FILENAME, mode='r') as event_file:
+            csv_reader = csv.DictReader(event_file)  # Use DictReader for easier column-based filtering
+            for row in csv_reader:
+                # Filter rows based on the criteria
+                if (row['Club'] == team and
+                    row['Course'] == course):
+                    team_results_raw.append(row)
+    except FileNotFoundError:
+        print(f"Error: File {RESTRICTED_EVENT_SCORING_DB_FILENAME} not found.")
+    except Exception as e:
+        print(f"An error occurred while reading {RESTRICTED_EVENT_SCORING_DB_FILENAME}: {e}")
+
+    # Convert the filtered rows into a final list format (optional step for presentation)
+    for row in team_results_raw:
+        # Convert time using secToTime before appending to the final list
+        time_in_sec = float(row['Time'])  # Assuming 'Time' is in seconds
+        formatted_time = secToTime(time_in_sec)  # Format the time
+        
+        # Include the new rankings (New Place and New Score) from the restricted event scoring file
+        team_results_final.append([
+            row['Gender'],
+            row['Event'],
+            row['New Place'],           # Use New Place
+            row['Name'],
+            formatted_time,            # Use the formatted time string
+            row['AQUA'],
+            row['New Score']           # Use New Score
+        ])
+
+    # Sort team_results_final by the Name column (index 3)
+    team_results_final.sort(key=lambda x: x[3])  # Sort by swimmer's name
+
+    return team_results_final
 
 ### MAIN SECTION ###

@@ -1,0 +1,59 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<script src="/static/scripts/sorttable.js"></script>
+
+<h2>{{ title }}</h2>
+<body>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ message }}</h3>
+            <p>The following scores take <b>U SPORTS Entry Limits</b> (4 events per swimmer, 1 relay per team) into account.</p>
+            <p>For a reranking using <b>every swim</b>, please see the <a href="power">Power Rankings</a>.</p>
+            <hr>
+            <form method="POST">
+                <div class="col-md-12">
+                    <h4>Team</h4>
+                    <select name="TARGET_TEAM">
+                        <option value="ACAD" {% if selected_team == "ACAD" %}selected{% endif %}>Acadia University</option>
+                        <option value="BADGR" {% if selected_team == "BADGR" %}selected{% endif %}>Brock University</option>
+                        <option value="CAR" {% if selected_team == "CAR" %}selected{% endif %}>Carleton University</option>
+                        <option value="DAL" {% if selected_team == "DAL" %}selected{% endif %}>Dalhousie University</option>
+                        <option value="MACU" {% if selected_team == "MACU" %}selected{% endif %}>McMaster University</option>
+                        <option value="MCGILL" {% if selected_team == "MCGILL" %}selected{% endif %}>McGill University</option>
+                        <option value="MTA" {% if selected_team == "MTA" %}selected{% endif %}>Mount Allison University</option>
+                        <option value="MUSC" {% if selected_team == "MUSC" %}selected{% endif %}>Memorial University of Newfoundland</option>
+                        <option value="OTT" {% if selected_team == "OTT" %}selected{% endif %}>University of Ottawa/Université d'Ottawa</option>
+                        <option value="QUE" {% if selected_team == "QUE" %}selected{% endif %}>Queen's University</option>
+                        <option value="UBCT" {% if selected_team == "UBCT" %}selected{% endif %}>University of British Columbia</option>
+                        <option value="UM" {% if selected_team == "UM" %}selected{% endif %}>University of Manitoba</option>
+                        <option value="UDEM" {% if selected_team == "UDEM" %}selected{% endif %}>Université de Montréal</option>
+                        <option value="UOFA" {% if selected_team == "UOFA" %}selected{% endif %}>University of Alberta</option>
+                        <option value="UOFC" {% if selected_team == "UOFC" %}selected{% endif %}>University of Calgary</option>
+                        <option value="UOFL" {% if selected_team == "UOFL" %}selected{% endif %}>University of Lethbridge</option>
+                        <option value="UOFR" {% if selected_team == "UOFR" %}selected{% endif %}>University of Regina</option>
+                        <option value="USHER" {% if selected_team == "USHER" %}selected{% endif %}>Université de Sherbrooke</option>
+                        <option value="UT" {% if selected_team == "UT" %}selected{% endif %}>University of Toronto</option>
+                        <option value="UG" {% if selected_team == "UG" %}selected{% endif %}>University of Guelph</option>
+                        <option value="ULAVAL" {% if selected_team == "ULAVAL" %}selected{% endif %}>Université Laval</option>
+                        <option value="UVIC" {% if selected_team == "UVIC" %}selected{% endif %}>University of Victoria</option>
+                        <option value="UQTR" {% if selected_team == "UQTR" %}selected{% endif %}>Université du Québec à Trois-Rivières</option>
+                        <option value="WAT" {% if selected_team == "WAT" %}selected{% endif %}>University of Waterloo</option>
+                        <option value="WES" {% if selected_team == "WES" %}selected{% endif %}>Western University</option>
+                        <option value="WLU" {% if selected_team == "WLU" %}selected{% endif %}>Wilfrid Laurier University</option>
+                        <option value="YU" {% if selected_team == "YU" %}selected{% endif %}>York University</option>
+                    </select>
+                </div>
+                <br>
+                <div class="col-md-12">
+                    <input type="submit" value="Get Rankings">
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+<html>
+{{ data|safe }}
+</html>
+{% endblock %}

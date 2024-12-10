@@ -5,63 +5,54 @@
 
 <h2>{{ title }}</h2>
 <body>
-
-    <body>
-        <div class="row">
-            <div class="col-md-12">
-                <h3>{{ message }}</h3>
-                <p>The following scores take <b>U SPORTS Entry Limits</b> (4 events per swimmer, 1 relay per team) into account.</p>
-                <p>For a reranking using <b>every swim</b>, please see the <a href="power">Power Rankings</a>.</p>
-                <hr>
-                <form method="POST">
-                    <div class="col-md-1">
-                        <h4>Gender</h4>
-                        <select name="TARGET_GENDER">
-                            <option value="Women">Female</option>
-                            <option value="Men">Male</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <h4>Event</h4>
-                        <select name="TARGET_EVENT">
-                            <option value="50m Freestyle">50 Free</option>
-                            <option value="100m Freestyle">100 Free</option>
-                            <option value="200m Freestyle">200 Free</option>
-                            <option value="400m Freestyle">400 Free</option>
-                            <option value="Distance">800/1500 Free</option>
-                            <option value="50m Backstroke">50 Back</option>
-                            <option value="100m Backstroke">100 Back</option>
-                            <option value="200m Backstroke">200 Back</option>
-                            <option value="50m Breaststroke">50 Breast</option>
-                            <option value="100m Breaststroke">100 Breast</option>
-                            <option value="200m Breaststroke">200 Breast</option>
-                            <option value="50m Butterfly">50 Fly</option>
-                            <option value="100m Butterfly">100 Fly</option>
-                            <option value="200m Butterfly">200 Fly</option>
-                            <option value="200m Medley">200 IM</option>
-                            <option value="400m Medley">400 IM</option>
-                            <option value="4 x 100m Freestyle">4x100 Free</option>
-                            <option value="4 x 200m Freestyle">4x200 Free</option>
-                            <option value="4 x 100m Medley">4x100 Medley</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <!--<h4>Export Type</h4>
-                        <select name="EXPORT_TYPE">
-                            <option value="Web" selected="selected">Web</option>
-                            <option value="CSV">CSV</option>
-                            <option value="Excel">Excel</option>
-                        </select>-->
-                    </div>
-                    <br><br>
-                    <input type="submit" value="Get Rankings">
-                </form>
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ message }}</h3>
+            <p>The following scores take <b>U SPORTS Entry Limits</b> (4 events per swimmer, 1 relay per team) into account.</p>
+            <p>For a reranking using <b>every swim</b>, please see the <a href="power">Power Rankings</a>.</p>
+            <hr>
+            <form method="POST">
+                <div class="col-md-1">
+                    <h4>Gender</h4>
+                    <select name="TARGET_GENDER">
+                        <option value="Women" {% if selected_gender == "Women" %}selected{% endif %}>Female</option>
+                        <option value="Men" {% if selected_gender == "Men" %}selected{% endif %}>Male</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <h4>Event</h4>
+                    <select name="TARGET_EVENT">
+                        <option value="50m Freestyle" {% if selected_event == "50m Freestyle" %}selected{% endif %}>50 Free</option>
+                        <option value="100m Freestyle" {% if selected_event == "100m Freestyle" %}selected{% endif %}>100 Free</option>
+                        <option value="200m Freestyle" {% if selected_event == "200m Freestyle" %}selected{% endif %}>200 Free</option>
+                        <option value="400m Freestyle" {% if selected_event == "400m Freestyle" %}selected{% endif %}>400 Free</option>
+                        <option value="Distance" {% if selected_event == "Distance" %}selected{% endif %}>800/1500 Free</option>
+                        <option value="50m Backstroke" {% if selected_event == "50m Backstroke" %}selected{% endif %}>50 Back</option>
+                        <option value="100m Backstroke" {% if selected_event == "100m Backstroke" %}selected{% endif %}>100 Back</option>
+                        <option value="200m Backstroke" {% if selected_event == "200m Backstroke" %}selected{% endif %}>200 Back</option>
+                        <option value="50m Breaststroke" {% if selected_event == "50m Breaststroke" %}selected{% endif %}>50 Breast</option>
+                        <option value="100m Breaststroke" {% if selected_event == "100m Breaststroke" %}selected{% endif %}>100 Breast</option>
+                        <option value="200m Breaststroke" {% if selected_event == "200m Breaststroke" %}selected{% endif %}>200 Breast</option>
+                        <option value="50m Butterfly" {% if selected_event == "50m Butterfly" %}selected{% endif %}>50 Fly</option>
+                        <option value="100m Butterfly" {% if selected_event == "100m Butterfly" %}selected{% endif %}>100 Fly</option>
+                        <option value="200m Butterfly" {% if selected_event == "200m Butterfly" %}selected{% endif %}>200 Fly</option>
+                        <option value="200m Medley" {% if selected_event == "200m Medley" %}selected{% endif %}>200 IM</option>
+                        <option value="400m Medley" {% if selected_event == "400m Medley" %}selected{% endif %}>400 IM</option>
+                        <option value="4 x 100m Freestyle" {% if selected_event == "4 x 100m Freestyle" %}selected{% endif %}>4x100 Free</option>
+                        <option value="4 x 200m Freestyle" {% if selected_event == "4 x 200m Freestyle" %}selected{% endif %}>4x200 Free</option>
+                        <option value="4 x 100m Medley" {% if selected_event == "4 x 100m Medley" %}selected{% endif %}>4x100 Medley</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                </div>
+                <br><br>
+                <input type="submit" value="Get Rankings">
+            </form>
         </div>
-    </body>
-
-    <html>
-    {{ data|safe }}
-    </html>
+    </div>
 </body>
+
+<html>
+{{ data|safe }}
+</html>
 {% endblock %}
