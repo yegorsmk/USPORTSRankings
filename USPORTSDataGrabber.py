@@ -668,7 +668,7 @@ for row in team_scoring_df:
     gender = row[0]
     event = row[1]
     club = row[3]
-    score = int(row[10])
+    score = int(row[11])
     group = row[8]
     
     if club in club_scores:
@@ -768,7 +768,7 @@ for row in team_scoring_df:
     event = row[1]
     course = row[2]
     club = row[3]
-    score = int(row[10])
+    score = int(row[11])
     group = row[8]
     
     # Aggregate scores by club and group
