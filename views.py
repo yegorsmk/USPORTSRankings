@@ -22,7 +22,7 @@ import USPORTSDataManager
 from datetime import date
 
 DATE_OF_LAST_UPDATE = "December 10th, 2024" 
-VERSION_NUMBER = "2.30"
+VERSION_NUMBER = "2.31"
 
 @app.route('/')
 def home():
@@ -58,7 +58,8 @@ def power():
             message=f"{TARGET_GENDER}'s {TARGET_EVENT} {TARGET_COURSE}",
             data=rankings_html,  # Pass the table as HTML to the template
             selected_gender = TARGET_GENDER,
-            selected_event = TARGET_EVENT
+            selected_event = TARGET_EVENT,
+            version=VERSION_NUMBER
         )
     else:  # GET request
         return render_template(
@@ -67,7 +68,8 @@ def power():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please select a Gender, Event, and click Get Rankings.',
-            data=""
+            data="",
+            version=VERSION_NUMBER
         )
 
 @app.route('/psych', methods=['GET', 'POST'])
@@ -101,7 +103,8 @@ def psych():
             message=f"{TARGET_GENDER}'s {TARGET_EVENT} {TARGET_COURSE}",
             data=rankings_html,  # Pass the table as HTML to the template
             selected_gender = TARGET_GENDER,
-            selected_event = TARGET_EVENT
+            selected_event = TARGET_EVENT,
+            version=VERSION_NUMBER
         )
     else:  # GET request
         return render_template(
@@ -110,7 +113,8 @@ def psych():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please select a Gender, Event, and click Get Rankings.',
-            data=""
+            data="",
+            version=VERSION_NUMBER
         )
 
 @app.route('/team')
@@ -132,7 +136,8 @@ def team():
         year=datetime.now().year,
         version=VERSION_NUMBER,
         womens_team_table=womens_html,
-        mens_team_table=mens_html
+        mens_team_table=mens_html,
+        version=VERSION_NUMBER
     )
 
 @app.route('/namesearch', methods=['GET', 'POST'])
@@ -156,7 +161,8 @@ def nameSearch():
             title='Unofficial U SPORTS Power Rankings as of ' + DATE_OF_LAST_UPDATE,
             year=datetime.now().year,
             message=f"{TARGET_NAME}'s {TARGET_COURSE} Rankings",
-            data=rankings_html  # Pass the table as HTML to the template
+            data=rankings_html,  # Pass the table as HTML to the template,
+            version=VERSION_NUMBER
         )
     else:  # GET request
         return render_template(
@@ -165,7 +171,8 @@ def nameSearch():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please enter a Name, and click Get Rankings.',
-            data=""
+            data="",
+            version=VERSION_NUMBER
         )
 
 @app.route('/teamsearch', methods=['GET', 'POST'])
@@ -190,7 +197,8 @@ def teamSearch():
             year=datetime.now().year,
             message=f"{TARGET_TEAM}'s {TARGET_COURSE} Rankings",
             data=rankings_html, # Pass the table as HTML to the template
-            selected_team = TARGET_TEAM
+            selected_team = TARGET_TEAM,
+            version=VERSION_NUMBER
         )
     else:  # GET request
         return render_template(
@@ -199,5 +207,6 @@ def teamSearch():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please select a Team, and click Get Rankings.',
-            data=""
+            data="",
+            version=VERSION_NUMBER
         )
