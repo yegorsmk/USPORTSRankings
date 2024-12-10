@@ -46,7 +46,7 @@ def power():
         power_rankings = USPORTSDataManager.ProvidePowerRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
         # Convert rankings to a pandas DataFrame for better presentation
-        rankings_df = pd.DataFrame(power_rankings, columns=['Place', 'Name', 'Team', 'Time', 'Score'])
+        rankings_df = pd.DataFrame(power_rankings, columns=['Place', 'Name', 'Team', 'Time', 'AQUA', 'Score'])
 
         # Convert the DataFrame to HTML
         rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
@@ -87,7 +87,7 @@ def psych():
         psych_rankings = USPORTSDataManager.ProvidePsychRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
         # Convert rankings to a pandas DataFrame for better presentation
-        rankings_df = pd.DataFrame(psych_rankings, columns=['Place', 'Name', 'Team', 'Time', 'Score'])
+        rankings_df = pd.DataFrame(psych_rankings, columns=['Place', 'Name', 'Team', 'Time', 'AQUA', 'Score'])
 
         # Convert the DataFrame to HTML
         rankings_html = rankings_df.to_html(classes='table table-striped', index=False)

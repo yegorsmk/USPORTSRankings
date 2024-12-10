@@ -3,12 +3,13 @@
 import csv
 
 ## GLOBALS
-MENS_TEAM_SCORING_DB_FILENAME = "mens_team_scoring_db.csv"
-WOMENS_TEAM_SCORING_DB_FILENAME = "womens_team_scoring_db.csv"
+OUTPUT_PREFIX = "OUTPUT_"
+MENS_TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "mens_team_scoring_db.csv"
+WOMENS_TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "womens_team_scoring_db.csv"
 
-EVENT_SCORING_DB_FILENAME = "event_scoring_db.csv"
+EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "event_scoring_db.csv"
 
-RESTRICTED_EVENT_SCORING_DB_FILENAME = "restricted_event_scoring_db.csv"
+RESTRICTED_EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "restricted_event_scoring_db.csv"
 
 ### CLASSES AND METHODS ###
 def timeToSec(swim_time):
@@ -72,8 +73,9 @@ def ProvidePowerRankings(gender, event, course):
         power_rankings_final.append([
             row['Place'],
             row['Name'],
-            row['Club'],
-            formatted_time,  # Use the formatted time string
+            row['Team'],
+            formatted_time,  # Use the formatted time string,
+            row['AQUA'],
             row['Score']
         ])
 
@@ -107,8 +109,9 @@ def ProvidePsychRankings(gender, event, course):
         psych_rankings_final.append([
             row['New Place'],           # Use New Place
             row['Name'],
-            row['Club'],
-            formatted_time,            # Use the formatted time string
+            row['Team'],
+            formatted_time,            # Use the formatted time string,
+            row['AQUA'],
             row['New Score']           # Use New Score
         ])
 
