@@ -164,7 +164,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "University of Ottawa/Université d'Ottawa" : "OTT", # Current
         "Queen's University" : "QUE",                   # Current
         "University of Toronto" : "UT",                 # Current
-        #"Trent University" : "TRE",                    # NOT CURRENT
+        #"Trent University" : "TRE",                    
         "University of Waterloo" : "WAT",               # Current
         "Western University" : "WES",                   # Current
         "Wilfrid Laurier University" : "WLU",           # Current
@@ -191,8 +191,12 @@ elif RUN_MODE == RUN_MODE_CANADA_WEST:
 
 USPORTS_TEAMS = TEAM_TO_SWIMRANKINGS_CLUB.keys()
 
-USPORTS_SWIMMER_ID_DATABASE_FILENAME = "USPORTSSwimmerIDDatabase.csv"
+OUTPUT_PREFIX = "OUTPUT_"
+
+USPORTS_SWIMMER_ID_DATABASE_FILENAME = OUTPUT_PREFIX + "USPORTSSwimmerIDDatabase.csv"
 USPORTS_YEAR = "2025"
+
+USPORTS_POINTS = "TODO"
 
 PLACE_TO_POINTS = {
     1 : 32,
@@ -226,19 +230,19 @@ COURSE_LCM = "Long Course (50m)"
 
 SCORING_COURSES = [COURSE_SCM]
 
-PROGRESS_TRACKER_FILENAME = "progress_tracker.txt"
+PROGRESS_TRACKER_FILENAME = OUTPUT_PREFIX + "progress_tracker.txt"
 
-RESULTS_DB_FILENAME = "results_db.csv"
-ATHLETE_IDS_FILENAME = "athlete_ids.csv"
+RESULTS_DB_FILENAME = OUTPUT_PREFIX + "results_db.csv"
+ATHLETE_IDS_FILENAME = OUTPUT_PREFIX + "athlete_ids.csv"
 
-EVENT_SCORING_DB_FILENAME = "event_scoring_db.csv"
-RESTRICTED_EVENT_SCORING_DB_FILENAME = "restricted_event_scoring_db.csv"
+EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "event_scoring_db.csv"
+RESTRICTED_EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "restricted_event_scoring_db.csv"
 
-TEAM_SCORING_DB_FILENAME = "team_scoring_db.csv"
-MENS_TEAM_SCORING_DB_FILENAME = "mens_team_scoring_db.csv"
-WOMENS_TEAM_SCORING_DB_FILENAME = "womens_team_scoring_db.csv"
+TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "team_scoring_db.csv"
+MENS_TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "mens_team_scoring_db.csv"
+WOMENS_TEAM_SCORING_DB_FILENAME = OUTPUT_PREFIX + "womens_team_scoring_db.csv"
 
-TEAM_BREAKDOWN_DB_FILENAME = "team_breakdown_db.csv"
+TEAM_BREAKDOWN_DB_FILENAME = OUTPUT_PREFIX + "team_breakdown_db.csv"
 
 RELAY_START_ALLOWANCE = 0.5
 SCM_TO_LCM_CONVERSION_FACTOR = 1.03
@@ -247,7 +251,13 @@ NUMBER_OF_INDIVIDUAL_EVENTS_TO_SCORE = 4
 SLEEP_TIME_PER_EVENT_PAGE = 1
 RANDOM_SLEEP_TIME_PER_EVENT_PAGE = 3
 
-RELAY_SCORE_MODIFIER = 2
+CANADA_WEST_RELAY_SCORE_MODIFIER = 2
+U_SPORTS_RELAY_SCORE_MODIFIER = 1
+
+if RUN_MODE == RUN_MODE_USPORTS:
+    RELAY_SCORE_MODIFIER = U_SPORTS_RELAY_SCORE_MODIFIER # 2 for CanWest, 1 for U SPORTS
+elif RUN_MODE == RUN_MODE_CANADA_WEST:
+    RELAY_SCORE_MODIFIER = CANADA_WEST_RELAY_SCORE_MODIFIER
 
 MAXIMUM_SCORED_SWIMS_PER_SWIMMER = 4
 MAXIMUM_SCORED_RELAYS_PER_TEAM_AND_GENDER = 1
@@ -385,12 +395,13 @@ def GenerateResultsDatabase():
                         swim_time = cols[4].get_text(strip=True)
                         if ("M" in swim_time):
                             swim_time = swim_time.replace('M', '')
+                        fina_points = cols[5].get_text(strip=True)
 
                         # Add the result to the results_db as a list
-                        results_list = [gender, event_name, course_type, swimrankings_club, name, timeToSec(swim_time)]
+                        results_list = [gender, event_name, course_type, swimrankings_club, name, timeToSec(swim_time), fina_points]
                         results_db.append(results_list)
 
-        results_df = pd.DataFrame(results_db, columns=['Gender', 'Event', 'Course', 'Team', 'Name', 'Time'])
+        results_df = pd.DataFrame(results_db, columns=['Gender', 'Event', 'Course', 'Team', 'Name', 'Time', 'AQUA'])
         results_df.to_csv(RESULTS_DB_FILENAME, index=False)
         print()
 
@@ -452,7 +463,7 @@ def secToTime(seconds):
 results_db, athlete_ids = GenerateResultsDatabase()
 
 ## Step 2: Output to CSV Files
-results_df = pd.DataFrame(results_db, columns=['Gender', 'Event', 'Course', 'Team', 'Name', 'Time'])
+results_df = pd.DataFrame(results_db, columns=['Gender', 'Event', 'Course', 'Team', 'Name', 'Time', 'AQUA'])
 results_df.to_csv(RESULTS_DB_FILENAME, index=False)
 
 athlete_ids_df = pd.DataFrame(athlete_ids, columns=['Athlete_ID', 'Team'])
@@ -512,7 +523,7 @@ for row in event_scoring_df:
 # Save event_scoring_df to a new CSV
 with open(EVENT_SCORING_DB_FILENAME, 'w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(["Gender", "Event", "Course", "Club", "Name", "Time", "Place", "Score", "Group"])  # Header
+    writer.writerow(["Gender", "Event", "Course", "Team", "Name", "Time", "AQUA", "Place", "Score", "Group"])  # Header
     writer.writerows(event_scoring_df)
 
 
@@ -637,7 +648,7 @@ for row in rescored_df:
 # Save restricted_event_scoring_df to a new CSV
 with open(RESTRICTED_EVENT_SCORING_DB_FILENAME, 'w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(["Gender", "Event", "Course", "Club", "Name", "Time", "Old Place", "Old Score", "Group", "New Place", "New Score"])  # Header
+    writer.writerow(["Gender", "Event", "Course", "Club", "Name", "Time", "AQUA", "Old Place", "Old Score", "Group", "New Place", "New Score"])  # Header
     writer.writerows(rescored_df)
 
 ## Step 4: Provide Team Events Scoring
@@ -783,7 +794,7 @@ with open(TEAM_BREAKDOWN_DB_FILENAME, mode='w', newline='') as file:
     writer = csv.writer(file)
     
     # Write the header
-    writer.writerow(['Club', 'Category', 'Score'])
+    writer.writerow(['Team', 'Category', 'Score'])
     
     # Write the breakdown rows
     writer.writerows(breakdown_data)

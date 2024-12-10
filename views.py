@@ -20,7 +20,9 @@ import csv
 import USPORTSDataManager
 
 from datetime import date
-today = date.today()
+
+DATE_OF_LAST_UPDATE = "December 10th, 2024" 
+VERSION_NUMBER = "2.0"
 
 @app.route('/')
 def home():
@@ -28,7 +30,8 @@ def home():
     return render_template(
         'index.html',
         title='Home',
-        year=datetime.now().year
+        year=datetime.now().year,
+        version=VERSION_NUMBER
     )
 
 @app.route('/power', methods=['GET', 'POST'])
@@ -50,7 +53,7 @@ def power():
 
         return render_template(
             'power.html',
-            title='Unofficial U SPORTS Power Rankings as of ' + today.strftime("%B %d, %Y"),
+            title='Unofficial U SPORTS Power Rankings as of ' + DATE_OF_LAST_UPDATE,
             year=datetime.now().year,
             message=f"{TARGET_GENDER}'s {TARGET_EVENT} {TARGET_COURSE}",
             data=rankings_html  # Pass the table as HTML to the template
@@ -58,8 +61,9 @@ def power():
     else:  # GET request
         return render_template(
             'power.html',
-            title='Unofficial U SPORTS Power Rankings as of ' + today.strftime("%B %d, %Y"),
+            title='Unofficial U SPORTS Power Rankings as of ' + DATE_OF_LAST_UPDATE,
             year=datetime.now().year,
+            version=VERSION_NUMBER,
             message='Please select a Gender, Event, and click Get Rankings.',
             data=""
         )
@@ -90,7 +94,7 @@ def psych():
 
         return render_template(
             'psych.html',
-            title='Unofficial U SPORTS Psych Rankings as of ' + today.strftime("%B %d, %Y"),
+            title='Unofficial U SPORTS Psych Rankings as of ' + DATE_OF_LAST_UPDATE,
             year=datetime.now().year,
             message=f"{TARGET_GENDER}'s {TARGET_EVENT} {TARGET_COURSE}",
             data=rankings_html  # Pass the table as HTML to the template
@@ -98,8 +102,9 @@ def psych():
     else:  # GET request
         return render_template(
             'psych.html',
-            title='Unofficial U SPORTS Psych Rankings as of ' + today.strftime("%B %d, %Y"),
+            title='Unofficial U SPORTS Psych Rankings as of ' + DATE_OF_LAST_UPDATE,
             year=datetime.now().year,
+            version=VERSION_NUMBER,
             message='Please select a Gender, Event, and click Get Rankings.',
             data=""
         )
@@ -119,8 +124,9 @@ def team():
 
     return render_template(
         'team.html',
-        title='Unofficial U SPORTS Team Rankings as of ' + today.strftime("%B %d, %Y"),
+        title='Unofficial U SPORTS Team Rankings as of ' + DATE_OF_LAST_UPDATE,
         year=datetime.now().year,
+        version=VERSION_NUMBER,
         womens_team_table=womens_html,
         mens_team_table=mens_html
     )
