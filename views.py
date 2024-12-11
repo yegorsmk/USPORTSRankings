@@ -22,7 +22,7 @@ import USPORTSDataManager
 from datetime import date
 
 DATE_OF_LAST_UPDATE = "December 10th, 2024" 
-VERSION_NUMBER = "2.31"
+VERSION_NUMBER = "2.32"
 
 @app.route('/')
 def home():
@@ -68,8 +68,7 @@ def power():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please select a Gender, Event, and click Get Rankings.',
-            data="",
-            version=VERSION_NUMBER
+            data=""
         )
 
 @app.route('/psych', methods=['GET', 'POST'])
@@ -113,8 +112,7 @@ def psych():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please select a Gender, Event, and click Get Rankings.',
-            data="",
-            version=VERSION_NUMBER
+            data=""
         )
 
 @app.route('/team')
@@ -136,8 +134,7 @@ def team():
         year=datetime.now().year,
         version=VERSION_NUMBER,
         womens_team_table=womens_html,
-        mens_team_table=mens_html,
-        version=VERSION_NUMBER
+        mens_team_table=mens_html
     )
 
 @app.route('/namesearch', methods=['GET', 'POST'])
@@ -172,7 +169,6 @@ def nameSearch():
             version=VERSION_NUMBER,
             message='Please enter a Name, and click Get Rankings.',
             data="",
-            version=VERSION_NUMBER
         )
 
 @app.route('/teamsearch', methods=['GET', 'POST'])
@@ -207,6 +203,5 @@ def teamSearch():
             year=datetime.now().year,
             version=VERSION_NUMBER,
             message='Please select a Team, and click Get Rankings.',
-            data="",
-            version=VERSION_NUMBER
+            data=""
         )
