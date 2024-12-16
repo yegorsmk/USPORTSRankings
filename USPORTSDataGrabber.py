@@ -231,9 +231,13 @@ COURSE_LCM = "Long Course (50m)"
 SCORING_COURSES = [COURSE_SCM]
 
 PROGRESS_TRACKER_FILENAME = OUTPUT_PREFIX + "progress_tracker.txt"
+CLUB_PROGRESS_TRACKER_FILENAME = OUTPUT_PREFIX + "club_progress_tracker.txt"
 
 RESULTS_DB_FILENAME = OUTPUT_PREFIX + "results_db.csv"
 ATHLETE_IDS_FILENAME = OUTPUT_PREFIX + "athlete_ids.csv"
+
+CLUB_RESULTS_DB_FILENAME = OUTPUT_PREFIX + "club_results_db.csv"
+CLUB_ATHLETE_IDS_FILENAME = OUTPUT_PREFIX + "club_athlete_ids.csv"
 
 EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "event_scoring_db.csv"
 RESTRICTED_EVENT_SCORING_DB_FILENAME = OUTPUT_PREFIX + "restricted_event_scoring_db.csv"
@@ -261,6 +265,9 @@ elif RUN_MODE == RUN_MODE_CANADA_WEST:
 
 MAXIMUM_SCORED_SWIMS_PER_SWIMMER = 4
 MAXIMUM_SCORED_RELAYS_PER_TEAM_AND_GENDER = 1
+
+CLUB_RESULTS_URL_PREFIX = "https://www.swimrankings.net/index.php?page=athleteDetail&athleteId="
+CLUB_RESULTS_URL_SUFFIX = "&pbest=" + str(USPORTS_YEAR)
 
 ### CLASSES AND METHODS ###
 def load_progress_tracker(filename):
@@ -415,7 +422,6 @@ def GenerateResultsDatabase():
 
     return results_db, athlete_ids
 
-
 def placeToPoints(p):
     points = 0
     if p in PLACE_TO_POINTS:
@@ -456,6 +462,117 @@ def secToTime(seconds):
         remaining_seconds = seconds % 60
         return f"{minutes}:{remaining_seconds:05.2f}"
 
+
+def load_club_progress_tracker(filename):
+    try:
+        with open(filename, "r") as file:
+            return set(line.strip() for line in file)
+    except FileNotFoundError:
+        return set()
+
+def save_to_club_progress_tracker(filename, athlete_id):
+    with open(filename, "a") as file:
+        file.write(athlete_id + "\n")
+
+'''
+def GenerateClubResultsDatabase():
+
+    club_results_db = []
+    try:
+        with open(CLUB_RESULTS_DB_FILENAME, "r") as file:
+            reader = csv.reader(file)
+            next(reader)
+            club_results_db = [row for row in reader]
+            print("Loaded Club Results DB")
+    except FileNotFoundError:
+        club_results_db = []
+        print("Could not load Club Results DB")
+
+    athlete_ids = []
+    try:
+        with open(ATHLETE_IDS_FILENAME, "r") as file:
+            reader = csv.reader(file)
+            next(reader)
+            athlete_ids = [row for row in reader]
+            print("Loaded Athlete IDs DB")
+    except FileNotFoundError:
+        athlete_ids = []
+        print("Could not load Athlete IDs DB")
+
+    for athlete_id in athlete_ids:
+        tracked_club_athlete_ids = load_club_progress_tracker(CLUB_PROGRESS_TRACKER_FILENAME)
+        if athlete_id in tracked_club_athlete_ids:
+            continue
+
+        club_results_url = CLUB_RESULTS_URL_PREFIX + athlete_id + CLUB_RESULTS_URL_PREFIX
+        response = requests.get(club_results_url)
+        if response.status_code == 200:
+            print("Successfully loaded page for " + club_results_url)
+        else:
+            print("Failed to load the page for " + club_results_url)
+        time.sleep(SLEEP_TIME_PER_EVENT_PAGE)
+
+        # Parse HTML with BeautifulSoup
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # TODO: Parse Soup to Get Results
+        table = soup.find('table', {'class': 'athleteBest'})
+
+        if table:
+            rows = table.find_all('athleteBest0')
+
+            for row in rows:
+                event = row[0]
+                course = row[1]
+
+                swim_time = row[2].get_text(strip=True)
+                if ("M" in swim_time):
+                    swim_time = swim_time.replace('M', '')
+
+                aqua = row[3].get_text(strip=True)
+                date = row[4]
+                city = row[5]
+                meet = row[6]
+
+                gender_str = "N/A"
+                event_str = "TODO"
+                course_str = "TODO"
+                team_str = "N/A"
+                name_str = "TODO"
+
+                results_list = [gender_str, event_str, course_str, team_str, name_str, timeToSec(swim_time), aqua]
+                club_results_db.append(results_list)
+
+            # TODO: Redo for all of athleteBest1 Rows
+
+
+        club_results_df = pd.DataFrame(club_results_db, columns=['Gender', 'Event', 'Course', 'Team', 'Name', 'Time', 'AQUA'])
+        club_results_df.to_csv(CLUB_RESULTS_DB_FILENAME, index=False)
+        print()
+
+        tracked_club_athlete_ids.append(athlete_id)
+        club_athlete_ids_df = pd.DataFrame(tracked_club_athlete_ids, columns=['Athlete_ID', 'Team'])
+        club_athlete_ids_df.to_csv(CLUB_ATHLETE_IDS_FILENAME, index=False)
+        print()
+
+        save_to_club_progress_tracker(CLUB_PROGRESS_TRACKER_FILENAME, athlete_id)
+
+    return club_results_db
+'''
+'''
+    for usports_team in USPORTS_TEAMS:
+
+            # Go to Each Event Page
+            for event_link in event_links:
+
+                # Loop through the rows of the table (skipping header row)
+                for row in table.find_all('tr')[2:]:
+                    # Extract the columns in the current row
+                    cols = row.find_all('td')
+'''
+
+
+
 ### MAIN SECTION ###
 
 ## Step 0: See if there has been any progress made... If there is, start there.
@@ -468,6 +585,10 @@ results_df.to_csv(RESULTS_DB_FILENAME, index=False)
 
 athlete_ids_df = pd.DataFrame(athlete_ids, columns=['Athlete_ID', 'Team'])
 athlete_ids_df.to_csv(ATHLETE_IDS_FILENAME, index=False)
+
+## Step 2.5 (Dec 16th, 2024): Get Club Results. Not every swimmer always represents their varsity tag, so we use their Swimrankings ID to get their PBs from this season.
+# TODO TODO TODO
+#club_results_db = GenerateClubResultsDatabase()
 
 ## Step 3: Provide Individual Events Filtering, Ranking, and Scoring
 # Sort results by gender, event, course, and then time. Then, score them.
