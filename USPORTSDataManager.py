@@ -73,6 +73,7 @@ def ProvidePowerRankings(gender, event, course):
             row['Place'],
             row['Name'],
             row['Team'],
+            row['Conference'],
             formatted_time,  # Use the formatted time string,
             row['AQUA'],
             row['Score']
@@ -109,6 +110,7 @@ def ProvidePsychRankings(gender, event, course):
             row['New Place'],           # Use New Place
             row['Name'],
             row['Club'],
+            row['Conference'],
             formatted_time,            # Use the formatted time string,
             row['AQUA'],
             row['New Score']           # Use New Score
