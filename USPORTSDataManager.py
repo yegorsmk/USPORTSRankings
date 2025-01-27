@@ -109,7 +109,7 @@ def ProvidePsychRankings(gender, event, course):
         psych_rankings_final.append([
             row['New Place'],           # Use New Place
             row['Name'],
-            row['Club'],
+            row['Team'],
             row['Conference'],
             formatted_time,            # Use the formatted time string,
             row['AQUA'],
@@ -194,7 +194,7 @@ def ProvideTeamResults(team, course):
             csv_reader = csv.DictReader(event_file)  # Use DictReader for easier column-based filtering
             for row in csv_reader:
                 # Filter rows based on the criteria
-                if (row['Club'] == team and
+                if (row['Team'] == team and
                     row['Course'] == course):
                     team_results_raw.append(row)
     except FileNotFoundError:
