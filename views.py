@@ -21,8 +21,8 @@ import USPORTSDataManager
 
 from datetime import date
 
-DATE_OF_LAST_UPDATE = "January 21st, 2025 - Non-Varsity Club Swims Coming Soon!" 
-VERSION_NUMBER = "2.6 - Non-Varsity Club Swims Coming Soon!"
+DATE_OF_LAST_UPDATE = "January 28th, 2025 - CLUB SWIMS ADDED!" 
+VERSION_NUMBER = "2.7 - CLUB SWIMS ADDED!"
 
 @app.route('/')
 def home():
@@ -46,10 +46,10 @@ def power():
         power_rankings = USPORTSDataManager.ProvidePowerRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
         # Convert rankings to a pandas DataFrame for better presentation
-        rankings_df = pd.DataFrame(power_rankings, columns=['Place', 'Name', 'Team', 'Time', 'AQUA', 'Score'])
+        rankings_df = pd.DataFrame(power_rankings, columns=['Place', 'Name', 'Team', 'Conference', 'Time', 'AQUA', 'Score'])
 
         # Convert the DataFrame to HTML
-        rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
+        rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
             'power.html',
@@ -90,10 +90,10 @@ def psych():
         psych_rankings = USPORTSDataManager.ProvidePsychRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
         # Convert rankings to a pandas DataFrame for better presentation
-        rankings_df = pd.DataFrame(psych_rankings, columns=['Place', 'Name', 'Team', 'Time', 'AQUA', 'Score'])
+        rankings_df = pd.DataFrame(psych_rankings, columns=['Place', 'Name', 'Team', 'Conference', 'Time', 'AQUA', 'Score'])
 
         # Convert the DataFrame to HTML
-        rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
+        rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
             'psych.html',
@@ -125,8 +125,8 @@ def team():
     mens_df = pd.DataFrame(mens_team_rankings, columns=['Rank', 'Team', 'Score'])
 
     # Convert DataFrame to HTML
-    womens_html = womens_df.to_html(classes='table table-striped', index=False)
-    mens_html = mens_df.to_html(classes='table table-striped', index=False)
+    womens_html = womens_df.to_html(classes='table table-striped sortable', index=False)
+    mens_html = mens_df.to_html(classes='table table-striped sortable', index=False)
 
     return render_template(
         'team.html',
@@ -151,7 +151,7 @@ def nameSearch():
         rankings_df = pd.DataFrame(name_results, columns=['Event', 'Time', 'AQUA', 'Place', 'Score'])
 
         # Convert the DataFrame to HTML
-        rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
+        rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
             'namesearch.html',
@@ -185,7 +185,7 @@ def teamSearch():
         rankings_df = pd.DataFrame(team_results, columns=['Gender', 'Event', 'Place', 'Name', 'Time', 'AQUA', 'Score'])
 
         # Convert the DataFrame to HTML
-        rankings_html = rankings_df.to_html(classes='table table-striped', index=False)
+        rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
             'teamsearch.html',
