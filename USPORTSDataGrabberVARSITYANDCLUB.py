@@ -721,6 +721,7 @@ athlete_ids_df.to_csv(ATHLETE_IDS_FILENAME, index=False)
 club_results_db = GenerateClubResultsDatabase()
 
 ## Step 2.75 (Jan 25th, 2024): Update Results with Club Results
+print("Varsity Results Database Created")
 # Load varsity results
 with open(RESULTS_DB_FILENAME, 'r') as file:
     reader = csv.reader(file)
