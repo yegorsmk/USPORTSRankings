@@ -716,12 +716,14 @@ results_df.to_csv(RESULTS_DB_FILENAME, index=False)
 
 athlete_ids_df = pd.DataFrame(athlete_ids, columns=['Athlete_ID', 'Team'])
 athlete_ids_df.to_csv(ATHLETE_IDS_FILENAME, index=False)
+print("Varsity Results Database Created")
 
 ## Step 2.5 (Dec 16th, 2024 - Jan 25th, 2024): Get Club Results. Not every swimmer always represents their varsity tag, so we use their Swimrankings ID to get their PBs from this season.
+print("Generating Club Database")
 club_results_db = GenerateClubResultsDatabase()
+print("Club Results Database Generated")
 
 ## Step 2.75 (Jan 25th, 2024): Update Results with Club Results
-print("Varsity Results Database Created")
 # Load varsity results
 with open(RESULTS_DB_FILENAME, 'r') as file:
     reader = csv.reader(file)
