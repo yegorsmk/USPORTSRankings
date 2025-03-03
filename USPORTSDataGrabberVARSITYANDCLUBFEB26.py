@@ -367,7 +367,7 @@ MAXIMUM_SCORED_RELAYS_PER_TEAM_AND_GENDER = 1
 CLUB_RESULTS_URL_PREFIX = "https://www.swimrankings.net/index.php?page=athleteDetail&athleteId="
 CLUB_RESULTS_URL_SUFFIX = "&pbest=" + str(USPORTS_YEAR)
 
-EXEMPT_IDS = ["4342739", "5627823", "4786149"]
+EXEMPT_IDS = ["4342739", "5627823", "4786149", "5339517", "4073747"]
 
 ### CLASSES AND METHODS ###
 def load_progress_tracker(filename):
