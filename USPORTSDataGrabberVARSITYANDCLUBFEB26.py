@@ -24,6 +24,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "Memorial University of Newfoundland",  # Current
         #"Université de Moncton",
         "Mount Allison University",             # Current
+        "University of New Brunswick",          # Current
         #"University of Prince Edward Island"
         ],
 
@@ -177,6 +178,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "University of Guelph" : "UG",                  # Current
         #"Laurentian University" : "LU",
         "McMaster University" : "MACU",                 # Current
+        "University of New Brunswick" : "UNB",          # Current
         "University of Ottawa/Université d'Ottawa" : "OTT", # Current
         "Queen's University" : "QUE",                   # Current
         "University of Toronto" : "UT",                 # Current
@@ -211,6 +213,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         # "LU": "Laurentian University",
         "MACU": "McMaster University",
         "OTT": "University of Ottawa/Université d'Ottawa",
+        "UNB": "University of New Brunswick",
         "QUE": "Queen's University",
         "UT": "University of Toronto",
         # "TRE": "Trent University",

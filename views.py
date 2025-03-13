@@ -21,8 +21,8 @@ import USPORTSDataManager
 
 from datetime import date
 
-DATE_OF_LAST_UPDATE = "March 3rd, 2025" 
-VERSION_NUMBER = "2.14 - PRE-USPORTS VERSION"
+DATE_OF_LAST_UPDATE = "March 13th, 2025" 
+VERSION_NUMBER = "2.15 - POST-USPORTS VERSION - Insights Available!"
 
 @app.route('/')
 def home():
@@ -30,6 +30,16 @@ def home():
     return render_template(
         'index.html',
         title='Home',
+        year=datetime.now().year,
+        version=VERSION_NUMBER
+    )
+
+@app.route('/insights')
+def insights():
+    """Renders the insightspage."""
+    return render_template(
+        'insights.html',
+        title='2025 U SPORTS Insights',
         year=datetime.now().year,
         version=VERSION_NUMBER
     )
