@@ -98,7 +98,6 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "University of Guelph",                 # Current
         #"Laurentian University",
         "McMaster University",                  # Current
-        "University of Ottawa/Université d'Ottawa", # Current
         "Queen's University",                   # Current
         "University of Toronto",                # Current
         #"Trent University",                    # NOT CURRENT
@@ -114,6 +113,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "Université Laval",
         "McGill University",
         "Université de Montréal",
+        "University of Ottawa/Université d'Ottawa", # Current
         "Université du Québec à Trois-Rivières",
         "Université de Sherbrooke"
         ]

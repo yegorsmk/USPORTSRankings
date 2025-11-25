@@ -22,7 +22,7 @@ import USPORTSDataManager
 from datetime import date
 
 DATE_OF_LAST_UPDATE = "November 24th, 2025" 
-VERSION_NUMBER = "1.0 - FIRST RANKINGS OF 2025-2026!"
+VERSION_NUMBER = "1.01 - FIRST RANKINGS OF 2025-2026! Ottawa returned to RSEQ."
 
 @app.route('/')
 def home():
