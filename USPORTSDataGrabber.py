@@ -13,17 +13,67 @@ from time import sleep
 import csv
 import random
 
+## CODE TO MAKE IT WORK IN 2025/2026
+def build_swimrankings_session():
+    s = requests.Session()
+
+    # Match your real browser headers (from the working curl)
+    s.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/142.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,"
+                  "image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Upgrade-Insecure-Requests": "1",
+    })
+
+    # IMPORTANT: paste your **current** cookies from the working curl here.
+    # At minimum, keep cf_clearance + PHPSESSID. These are examples/placeholder values.
+    s.cookies.update({
+        "PHPSESSID": "cgd10ma1t9ldumfk6n3s7da2hu",
+        "cf_clearance": "CLNb3jlMOf8OUZL2KTm2zEC5kvZEnl8cjlHRdm6O..4-1764031076-1.2.1.1-AdlG7uz1LHEKDidk1mffi3hcBaCHfOQwGt7vNLHW7vXEfHDNwz7huWmPy4a92Ko9blwLvQ3o9WgBKj3dmv3d88IRAQ3WgBlhsPIbUQpm1hjKgP3pXmc_TNF_5QTkDdZw2HfdhIyk0Z.B5UUxEIczSlEsr1QvTpv64Ch7ob9kL6uYoM6P4w8RDNQYdabBQAJ7HGMcr9ewHRsKWZewF6V3mJRVaUNX5ilLFHLJEp9r6zo",
+        "accept-tracking": "1",
+        "shw": "1600:2560",
+        # _ga etc are optional; you can include them if you want
+        # "_ga": "GA1.1.72842532.1701351425",
+    })
+
+    return s
+
+SWIMRANKINGS_SESSION = build_swimrankings_session()
+
+def safe_get(url, session=SWIMRANKINGS_SESSION, label=""):
+    resp = session.get(url, timeout=30)
+    if resp.status_code == 200:
+        print(f"Successfully loaded page {label or ''} -> {url}")
+        return resp
+    elif resp.status_code == 503:
+        # Hard fail so you notice it's a block and not “empty” data
+        raise RuntimeError(
+            f"Got 503 from Swimrankings on {label or url}. "
+            "Cloudflare is blocking you again – refresh cf_clearance / cookies from your browser."
+        )
+    else:
+        raise RuntimeError(
+            f"Failed to load page {label or ''} -> {url} "
+            f"(status {resp.status_code})"
+        )
+
+
 ## GLOBALS
 if RUN_MODE == RUN_MODE_USPORTS:
     DICT_OF_TEAMS_BY_CONFERENCE = {
         # ATLANTIC UNIVERSITY SPORT
         "AUS":
         [
-        "Acadia University",                    # Current
+        #"Acadia University",                    # NOT UPDATED FOR 2025/2026 - CHECK BACK
         "Dalhousie University",                 # Current
-        "Memorial University of Newfoundland",  # Current
+        #"Memorial University of Newfoundland",  # NOT UPDATED FOR 2025/2026 - CHECK BACK
         #"Université de Moncton",
-        "Mount Allison University",             # Current
+        #"Mount Allison University",             # NOT UPDATED FOR 2025/2026 - CHECK BACK
         "University of New Brunswick",          # Current
         #"University of Prince Edward Island"
         ],
@@ -31,7 +81,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         # CANADA WEST
         "CW":
         [
-        "University of Alberta",                # Current
+        #"University of Alberta",               # RIP
         "University of British Columbia",       # Current
         "University of Calgary",                # Current
         "University of Lethbridge",             # Current
@@ -75,7 +125,7 @@ elif RUN_MODE == RUN_MODE_CANADA_WEST:
         # CANADA WEST
         "CW":
         [
-        "University of Alberta",
+        #"University of Alberta",           # RIP
         "University of British Columbia"
         "University of Calgary",
         "University of Lethbridge",
@@ -160,13 +210,13 @@ SWIMRANKINGS_CLUB_STEM = "https://www.swimrankings.net/index.php?page=rankingDet
 
 if RUN_MODE == RUN_MODE_USPORTS:
     TEAM_TO_SWIMRANKINGS_CLUB = {
-        "Acadia University" : "ACAD",                   # Current
+        #"Acadia University" : "ACAD",                   # NOT UPDATED FOR 2025/2026 - CHECK BACK
         "Dalhousie University" : "DAL",                 # Current
-        "Memorial University of Newfoundland" : "MUSC", # Current
+        #"Memorial University of Newfoundland" : "MUSC", # NOT UPDATED FOR 2025/2026 - CHECK BACK
         #"Université de Moncton" : None,
-        "Mount Allison University" : "MTA",             # Current
+        #"Mount Allison University" : "MTA",             # NOT UPDATED FOR 2025/2026 - CHECK BACK
         #"University of Prince Edward Island" : None,
-        "University of Alberta" : "UOFA",               # Current
+        #"University of Alberta" : "UOFA",              # RIP
         "University of British Columbia" : "UBCT",      # Current
         "University of Calgary" : "UOFC",               # Current
         "University of Lethbridge" : "UOFL",            # Current
@@ -194,13 +244,13 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "Université de Sherbrooke"  : "USHER"           # Current
     }
     SWIMRANKINGS_CLUB_TO_TEAM = {
-        "ACAD": "Acadia University",
+        #"ACAD": "Acadia University",   # NOT UPDATED FOR 2025/2026 - CHECK BACK
         "DAL": "Dalhousie University",
-        "MUSC": "Memorial University of Newfoundland",
+        #"MUSC": "Memorial University of Newfoundland", # NOT UPDATED FOR 2025/2026 - CHECK BACK
         # "None": "Université de Moncton",
-        "MTA": "Mount Allison University",
+        #"MTA": "Mount Allison University", # NOT UPDATED FOR 2025/2026 - CHECK BACK
         # "None": "University of Prince Edward Island",
-        "UOFA": "University of Alberta",
+        # "UOFA": "University of Alberta",
         "UBCT": "University of British Columbia",
         "UOFC": "University of Calgary",
         "UOFL": "University of Lethbridge",
@@ -231,7 +281,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
 elif RUN_MODE == RUN_MODE_CANADA_WEST:
     # Canada West Version
     TEAM_TO_SWIMRANKINGS_CLUB = {
-        "University of Alberta" : "UOFA",
+        #"University of Alberta" : "UOFA",
         "University of British Columbia" : "UBCT",
         "University of Calgary" : "UOFC",
         "University of Lethbridge" : "UOFL",
@@ -241,7 +291,7 @@ elif RUN_MODE == RUN_MODE_CANADA_WEST:
     }
 
     SWIMRANKINGS_CLUB_TO_TEAM = {
-    "UOFA": "University of Alberta",
+    #"UOFA": "University of Alberta",
     "UBCT": "University of British Columbia",
     "UOFC": "University of Calgary",
     "UOFL": "University of Lethbridge",
@@ -264,7 +314,7 @@ USPORTS_TEAMS = TEAM_TO_SWIMRANKINGS_CLUB.keys()
 OUTPUT_PREFIX = "OUTPUT_"
 
 USPORTS_SWIMMER_ID_DATABASE_FILENAME = OUTPUT_PREFIX + "USPORTSSwimmerIDDatabase.csv"
-USPORTS_YEAR = "2025"
+USPORTS_YEAR = "2026"
 
 USPORTS_POINTS = {
     1 : 32,
@@ -370,7 +420,9 @@ MAXIMUM_SCORED_RELAYS_PER_TEAM_AND_GENDER = 1
 CLUB_RESULTS_URL_PREFIX = "https://www.swimrankings.net/index.php?page=athleteDetail&athleteId="
 CLUB_RESULTS_URL_SUFFIX = "&pbest=" + str(USPORTS_YEAR)
 
-EXEMPT_IDS = ["4342739", "5627823", "4786149", "5339517", "4073747"]
+EXEMPT_IDS = []
+#EXEMPT_IDS = ["4342739", "5627823", "4786149", "5339517", "4073747"]
+EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697"]
 
 ### CLASSES AND METHODS ###
 def load_progress_tracker(filename):
@@ -418,9 +470,26 @@ def GenerateResultsDatabase():
             swimrankings_club_ranking_url = SWIMRANKINGS_CLUB_STEM + swimrankings_club + SWIMRANKINGS_GENDER_STEM + str(gender_int)
 
             # Load Top Times Page
-            response = requests.get(swimrankings_club_ranking_url)
+            #response = requests.get(swimrankings_club_ranking_url)
+
+            ## NEW CODE TRIAL
+            response = safe_get(
+                swimrankings_club_ranking_url,
+                session=SWIMRANKINGS_SESSION,
+                label=f"club top times {swimrankings_club} gender={gender_int}",
+            )
+
+            ## NEW CODE TRIAL
+
+
+
+
+
+
             if response.status_code == 200:
                 print("Successfully loaded page for " + swimrankings_club)
+            elif response.status_code == 503:
+                print("Swimrankings down for maintenance on " + swimrankings_club)
             else:
                 print("Failed to load the page for " + swimrankings_club)
             sleep(SLEEP_TIME_PER_EVENT_PAGE)
@@ -439,7 +508,16 @@ def GenerateResultsDatabase():
             
             # Go to Each Event Page
             for event_link in event_links:
-                response = requests.get(event_link)
+                #response = requests.get(event_link)
+
+                ## NEW CODE TRIAL
+                response = safe_get(
+                        event_link,
+                        session=SWIMRANKINGS_SESSION,
+                        label=f"event page {event_link}",
+                    )
+
+                ## NEW CODE TRIAL
 
                 if response.status_code == 200:
                     print(f"Successfully loaded the event page: {event_link}")
@@ -653,7 +731,18 @@ def GenerateClubResultsDatabase():
                 continue
 
         club_results_url = CLUB_RESULTS_URL_PREFIX + confirmed_athlete_id + CLUB_RESULTS_URL_SUFFIX
-        response = requests.get(club_results_url)
+        #response = requests.get(club_results_url)
+
+        ## NEW CODE TRIAL
+
+        response = safe_get(
+            club_results_url,
+            session=SWIMRANKINGS_SESSION,
+            label=f"athlete {confirmed_athlete_id} club PBs",
+        )
+
+        ## NEW CODE TRIAL
+
         if response.status_code == 200:
             print("Successfully loaded page for " + club_results_url)
         else:
