@@ -35,4 +35,17 @@
 <h3>IP addresses by total accesses</h3>
 {{ ip_counts_html|safe }}
 
+<hr>
+
+<h3>Full raw usage log</h3>
+<p>
+  <a class="btn btn-primary"
+     href="{{ url_for('usage_log_download', pwd=request.args.get('pwd')) }}">
+    Download usage_log.csv
+  </a>
+</p>
+
+{{ full_log_html|safe }}
+
+
 {% endblock %}

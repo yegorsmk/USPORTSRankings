@@ -475,6 +475,12 @@ def usage():
     # requires an API key or local DB, so here we just list the IPs +
     # hit counts.
 
+    # ---------------------------------------------------
+    # 7) Full raw log dump as a table
+    # ---------------------------------------------------
+    full_log_html = df.to_html(classes="table table-striped", index=False)
+
+
     return render_template(
         'usage.html',
         title='Usage Statistics',
@@ -489,4 +495,23 @@ def usage():
         psych_team_html=psych_team_html,
         pageviews_html=pageviews_html,
         ip_counts_html=ip_counts_html,
+        full_log_html=full_log_html,  # NEW
+    )
+
+@app.route('/usage_log_download')
+def usage_log_download():
+    # Reuse the same password protection
+    if not usage_auth_required():
+        # Bounce them to /usage so they see the password form
+        return redirect(url_for('usage'))
+
+    if not os.path.exists(ANALYTICS_LOG):
+        flash("No usage log file to download yet.")
+        return redirect(url_for('usage', pwd=request.args.get('pwd', '')))
+
+    # Send the CSV as a download
+    return send_from_directory(
+        directory='.',
+        path=ANALYTICS_LOG,
+        as_attachment=True
     )
