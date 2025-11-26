@@ -422,7 +422,9 @@ CLUB_RESULTS_URL_SUFFIX = "&pbest=" + str(USPORTS_YEAR)
 
 EXEMPT_IDS = []
 #EXEMPT_IDS = ["4342739", "5627823", "4786149", "5339517", "4073747"]
-EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697"]
+EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697"]  # Foreign kids that don't have Swimrankings Athlete page functionality
+
+DO_NOT_COLLECT_IDS = ["4454358", "4596667", "4570202"]  # Finlay Knox, Blake Tierney, Hugh McNeill
 
 ### CLASSES AND METHODS ###
 def load_progress_tracker(filename):
@@ -580,23 +582,25 @@ def GenerateResultsDatabase():
                     if len(cols) > 1:
                         # Get the Athlete ID
                         athlete_id = athlete_ids_from_event[athlete_id_i][0]
-                        athlete_team_long = SWIMRANKINGS_CLUB_TO_TEAM[swimrankings_club]
-                        athlete_conference = TEAMS_TO_CONFERENCES[athlete_team_long]
 
-                        # Extract the swimmer's name (Lastname, firstname)
-                        name = cols[0].get_text(strip=True)
-                        name = name.encode('utf-8').decode('utf-8')
-                        name = name.replace(',', '')
+                        if (athlete_id) not in DO_NOT_COLLECT_IDS:
+                            athlete_team_long = SWIMRANKINGS_CLUB_TO_TEAM[swimrankings_club]
+                            athlete_conference = TEAMS_TO_CONFERENCES[athlete_team_long]
 
-                        # Extract the time (as string)
-                        swim_time = cols[4].get_text(strip=True)
-                        if ("M" in swim_time):
-                            swim_time = swim_time.replace('M', '')
-                        fina_points = cols[5].get_text(strip=True)
+                            # Extract the swimmer's name (Lastname, firstname)
+                            name = cols[0].get_text(strip=True)
+                            name = name.encode('utf-8').decode('utf-8')
+                            name = name.replace(',', '')
 
-                        # Add the result to the results_db as a list
-                        results_list = [athlete_id, gender, event_name, course_type, swimrankings_club, athlete_conference, name, timeToSec(swim_time), fina_points]
-                        results_db.append(results_list)
+                            # Extract the time (as string)
+                            swim_time = cols[4].get_text(strip=True)
+                            if ("M" in swim_time):
+                                swim_time = swim_time.replace('M', '')
+                            fina_points = cols[5].get_text(strip=True)
+
+                            # Add the result to the results_db as a list
+                            results_list = [athlete_id, gender, event_name, course_type, swimrankings_club, athlete_conference, name, timeToSec(swim_time), fina_points]
+                            results_db.append(results_list)
                     athlete_id_i += 1
 
         results_df = pd.DataFrame(results_db, columns=['Athlete ID', 'Gender', 'Event', 'Course', 'Team', 'Conference', 'Name', 'Time', 'AQUA'])
@@ -709,6 +713,9 @@ def GenerateClubResultsDatabase():
             tracked_club_athlete_ids.append([athlete_id])
             club_athlete_ids_df = pd.DataFrame(tracked_club_athlete_ids, columns=['Athlete_ID'])
             club_athlete_ids_df.to_csv(CLUB_ATHLETE_IDS_FILENAME, index=False)
+            continue
+
+        if athlete_id in DO_NOT_COLLECT_IDS:
             continue
 
         for results_row in results_db:
@@ -908,7 +915,7 @@ for row in event_scoring_df:
 
         # Double Points for Relays
         if "x" in event:
-            points *= 2
+            points *= RELAY_SCORE_MODIFIER
 
         row.append(points)
     else:
@@ -932,19 +939,19 @@ with open(EVENT_SCORING_DB_FILENAME, 'r') as file:
 
 # Restrict the event scores by Top 4 Swims per Swimmer and Top 1 Swim per relay
 # Apply filtering and rescoring
-individual_athletes = []
-individual_teams = []
+individual_athletes = set()
+relay_teams = set()
 
-# Get Individual Athletes and Teams
 for row in event_scoring_df:
     event = row[2]
-    swimmer_name = row[6]
+    name = row[6]
+    team = row[4]
 
-    if ('x' not in event) and (swimmer_name not in individual_athletes):
-        individual_athletes.append(swimmer_name)
+    if 'x' not in event:  # Individual event
+        individual_athletes.add(name)
 
-    if ('x' in event) and (swimmer_name not in individual_teams):
-        individual_teams.append(swimmer_name)
+    else:  # Relay event
+        relay_teams.add(team)
 
 # Get Top 4 Swims for Each Individual
 from operator import itemgetter
@@ -961,19 +968,21 @@ for individual_athlete in individual_athletes:
 
 # Get Top 1 Swim for Each Relay
 top_relay_swims = []
-for individual_team in individual_teams:
-    selected_rows = []
-    seen_relays = []
-    for row in event_scoring_df:
-        gender = row[1]
-        event = row[2]
-        team_name = row[5]
-        if (team_name == individual_team) and (event in LIST_OF_SCORED_RELAY_EVENTS) and ([gender, event] not in seen_relays):
-            seen_relays.append([gender, event])
-            selected_rows.append(row)
 
-    for selected_row in selected_rows:
-        top_relay_swims.append(selected_row)
+for team in relay_teams:
+    for gender in [GENDER_MEN, GENDER_WOMEN]:
+        for relay_event in LIST_OF_SCORED_RELAY_EVENTS:
+            # collect all relay swims for (team, gender, relay_event)
+            relay_candidates = [
+                row for row in event_scoring_df
+                if row[4] == team and row[1] == gender and row[2] == relay_event
+            ]
+
+            if relay_candidates:
+                # sort by time ascending (fastest first)
+                relay_candidates.sort(key=lambda x: float(timeToSec(x[7])))
+                top_relay = relay_candidates[0]
+                top_relay_swims.append(top_relay)
 
 rescored_df = top_individual_swims + top_relay_swims
 
