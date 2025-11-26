@@ -25,6 +25,11 @@ DATE_OF_LAST_UPDATE = "November 26th, 2025"
 VERSION_NUMBER = "1.011 - FIRST RANKINGS OF 2025-2026! Fixed relay errors."
 ANALYTICS_LOG = "usage_log.csv"
 
+USAGE_PASSWORD = "REMOVED_PASSWORD"
+
+def usage_auth_required():
+    return request.args.get("pwd", "") == USAGE_PASSWORD
+
 def _get_client_fingerprint():
     """
     Hash of IP + User-Agent so you can estimate 'unique users'
@@ -295,6 +300,16 @@ def teamSearch():
 @app.route('/usage')
 def usage():
     """Usage statistics dashboard."""
+
+    # Password protection
+    if not usage_auth_required():
+        return '''
+            <h2>Usage Stats – Password Required</h2>
+            <form method="get">
+                <input type="password" name="pwd" placeholder="Enter password">
+                <button type="submit">Submit</button>
+            </form>
+        '''
     log_event("page_view", "/usage")
 
     if not os.path.exists(ANALYTICS_LOG):
