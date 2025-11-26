@@ -23,7 +23,7 @@ from datetime import date
 
 DATE_OF_LAST_UPDATE = "November 26th, 2025" 
 VERSION_NUMBER = "1.011 - FIRST RANKINGS OF 2025-2026! Fixed relay errors."
-ANALYTICS_LOG = "usage_log.csv"
+ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
 USAGE_PASSWORD = "REMOVED_PASSWORD"
 
@@ -41,12 +41,6 @@ def _get_client_fingerprint():
 
 
 def log_event(event_type, route, detail=""):
-    """
-    Append a single analytics row to usage_log.csv
-    event_type: 'page_view', 'power_query', 'psych_query', etc.
-    route: e.g. '/power', '/team'
-    detail: free text like 'gender=Men,event=100m Freestyle'
-    """
     ts = datetime.utcnow().isoformat()
     client_id = _get_client_fingerprint()
 
@@ -60,6 +54,7 @@ def log_event(event_type, route, detail=""):
                 ["timestamp", "event_type", "route", "client_id", "method", "detail"]
             )
         writer.writerow(row)
+
 
 def parse_detail(detail_str: str) -> dict:
     """
@@ -498,20 +493,22 @@ def usage():
         full_log_html=full_log_html,  # NEW
     )
 
+from flask import send_file  # you already have send_from_directory, this is separate
+
 @app.route('/usage_log_download')
 def usage_log_download():
-    # Reuse the same password protection
+    # Reuse password protection
     if not usage_auth_required():
-        # Bounce them to /usage so they see the password form
         return redirect(url_for('usage'))
 
     if not os.path.exists(ANALYTICS_LOG):
         flash("No usage log file to download yet.")
+        # preserve pwd param if present
         return redirect(url_for('usage', pwd=request.args.get('pwd', '')))
 
-    # Send the CSV as a download
-    return send_from_directory(
-        '.',
+    return send_file(
         ANALYTICS_LOG,
-        as_attachment=True
+        as_attachment=True,
+        download_name="usage_log.csv"  # Flask >= 2.0; drop this arg if you're on older Flask
     )
+
