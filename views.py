@@ -23,10 +23,59 @@ from datetime import date
 
 DATE_OF_LAST_UPDATE = "November 26th, 2025" 
 VERSION_NUMBER = "1.011 - FIRST RANKINGS OF 2025-2026! Fixed relay errors."
+ANALYTICS_LOG = "usage_log.csv"
+
+def _get_client_fingerprint():
+    """
+    Hash of IP + User-Agent so you can estimate 'unique users'
+    without storing raw IPs.
+    """
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "")
+    ua = request.headers.get("User-Agent", "")
+    return ip
+
+
+def log_event(event_type, route, detail=""):
+    """
+    Append a single analytics row to usage_log.csv
+    event_type: 'page_view', 'power_query', 'psych_query', etc.
+    route: e.g. '/power', '/team'
+    detail: free text like 'gender=Men,event=100m Freestyle'
+    """
+    ts = datetime.utcnow().isoformat()
+    client_id = _get_client_fingerprint()
+
+    row = [ts, event_type, route, client_id, request.method, detail]
+
+    file_exists = os.path.exists(ANALYTICS_LOG)
+    with open(ANALYTICS_LOG, "a", newline="") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(
+                ["timestamp", "event_type", "route", "client_id", "method", "detail"]
+            )
+        writer.writerow(row)
+
+def parse_detail(detail_str: str) -> dict:
+    """
+    Parse the detail string like 'gender=Men,event=100m Freestyle,course=Short Course (25m)'
+    into a dict: {'gender': 'Men', 'event': '100m Freestyle', 'course': 'Short Course (25m)'}
+    """
+    if not isinstance(detail_str, str):
+        return {}
+    parts = [p.strip() for p in detail_str.split(",") if p.strip()]
+    out = {}
+    for p in parts:
+        if "=" in p:
+            k, v = p.split("=", 1)
+            out[k.strip()] = v.strip()
+    return out
+
 
 @app.route('/')
 def home():
     """Renders the home page."""
+    log_event("page_view", "/")
     return render_template(
         'index.html',
         title='Home',
@@ -36,7 +85,8 @@ def home():
 
 @app.route('/insights')
 def insights():
-    """Renders the insightspage."""
+    """Renders the insights page."""
+    log_event("page_view", "/insights")
     return render_template(
         'insights.html',
         title='2025 U SPORTS Insights',
@@ -51,6 +101,13 @@ def power():
         TARGET_GENDER = request.form['TARGET_GENDER']
         TARGET_EVENT = request.form['TARGET_EVENT']
         TARGET_COURSE = "Short Course (25m)"
+
+        # Log the query
+        log_event(
+            "power_query",
+            "/power",
+            detail=f"gender={TARGET_GENDER},event={TARGET_EVENT},course={TARGET_COURSE}"
+        )
 
         # Call ProvideIndividualRankings to get filtered rankings
         power_rankings = USPORTSDataManager.ProvidePowerRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
@@ -96,6 +153,12 @@ def psych():
                 
         TARGET_COURSE = "Short Course (25m)"
 
+        log_event(
+            "psych_query",
+            "/psych",
+            detail=f"gender={TARGET_GENDER},event={TARGET_EVENT},course={TARGET_COURSE}"
+        )
+
         # Call ProvideIndividualRankings to get filtered rankings
         psych_rankings = USPORTSDataManager.ProvidePsychRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
@@ -128,6 +191,7 @@ def psych():
 @app.route('/team')
 def team():
     """Renders the Team Rankings report."""
+    log_event("page_view", "/team")
     womens_team_rankings, mens_team_rankings = USPORTSDataManager.ProvideTeamRankings()
 
     # Convert to pandas DataFrame
@@ -153,6 +217,12 @@ def nameSearch():
     if request.method == 'POST':
         TARGET_NAME = request.form['TARGET_NAME']
         TARGET_COURSE = "Short Course (25m)"
+
+        log_event(
+            "name_search",
+            "/namesearch",
+            detail=f"name={TARGET_NAME},course={TARGET_COURSE}"
+        )
 
         # Call ProvideNameRankings to get filtered rankings
         name_results = USPORTSDataManager.ProvideNameResults(TARGET_NAME, TARGET_COURSE)
@@ -188,6 +258,12 @@ def teamSearch():
         TARGET_TEAM = request.form['TARGET_TEAM']
         TARGET_COURSE = "Short Course (25m)"
 
+        log_event(
+            "team_search",
+            "/teamsearch",
+            detail=f"team={TARGET_TEAM},course={TARGET_COURSE}"
+        )
+
         # Call ProvideIndividualRankings to get filtered rankings
         team_results = USPORTSDataManager.ProvideTeamResults(TARGET_TEAM, TARGET_COURSE)
 
@@ -215,3 +291,187 @@ def teamSearch():
             message='Please select a Team, and click Get Rankings.',
             data=""
         )
+
+@app.route('/usage')
+def usage():
+    """Usage statistics dashboard."""
+    log_event("page_view", "/usage")
+
+    if not os.path.exists(ANALYTICS_LOG):
+        flash("No usage data yet.")
+        return render_template(
+            'usage.html',
+            title='Usage Statistics',
+            year=datetime.now().year,
+            version=VERSION_NUMBER,
+            summary_html="No data yet.",
+            routes_html="",
+            daily_html="",
+            power_gender_event_html="",
+            power_name_html="",
+            psych_gender_event_html="",
+            psych_team_html="",
+            pageviews_html="",
+            ip_counts_html=""
+        )
+
+    df = pd.read_csv(ANALYTICS_LOG)
+
+    # ------------------------
+    # BASIC SUMMARY / ROUTES
+    # ------------------------
+    total_events = len(df)
+    unique_users = df["client_id"].nunique()
+
+    route_counts = (
+        df.groupby("route")["event_type"]
+        .count()
+        .reset_index(name="hits")
+        .sort_values("hits", ascending=False)
+    )
+
+    df["date"] = pd.to_datetime(df["timestamp"]).dt.date
+    daily_counts = (
+        df.groupby("date")["event_type"]
+        .count()
+        .reset_index(name="hits")
+        .sort_values("date")
+    )
+
+    summary_df = pd.DataFrame(
+        {
+            "metric": ["Total events logged", "Unique visitors (approx)"],
+            "value": [total_events, unique_users],
+        }
+    )
+
+    summary_html = summary_df.to_html(classes="table table-striped", index=False)
+    routes_html = route_counts.to_html(classes="table table-striped", index=False)
+    daily_html = daily_counts.to_html(classes="table table-striped", index=False)
+
+    # -----------------------------------------------------------------
+    # 1) Power Rankings: most popular Gender-Event populations by access
+    # -----------------------------------------------------------------
+    power_df = df[df["event_type"] == "power_query"].copy()
+    if not power_df.empty:
+        power_details = power_df["detail"].fillna("").apply(parse_detail)
+        power_df["gender"] = power_details.apply(lambda d: d.get("gender", ""))
+        power_df["event"] = power_details.apply(lambda d: d.get("event", ""))
+
+        power_gender_event_counts = (
+            power_df.groupby(["gender", "event"])
+            .size()
+            .reset_index(name="hits")
+            .sort_values("hits", ascending=False)
+        )
+        power_gender_event_html = power_gender_event_counts.to_html(
+            classes="table table-striped", index=False
+        )
+    else:
+        power_gender_event_html = "<p>No Power Rankings queries yet.</p>"
+
+    # ---------------------------------------------------
+    # 2) Power Rankings: most popular names by accesses
+    #    (from /namesearch, event_type = 'name_search')
+    # ---------------------------------------------------
+    name_df = df[df["event_type"] == "name_search"].copy()
+    if not name_df.empty:
+        name_details = name_df["detail"].fillna("").apply(parse_detail)
+        name_df["name"] = name_details.apply(lambda d: d.get("name", ""))
+
+        power_name_counts = (
+            name_df.groupby("name")
+            .size()
+            .reset_index(name="hits")
+            .sort_values("hits", ascending=False)
+        )
+        power_name_html = power_name_counts.to_html(
+            classes="table table-striped", index=False
+        )
+    else:
+        power_name_html = "<p>No name searches yet.</p>"
+
+    # -----------------------------------------------------------------
+    # 3) Psych Sheets: most popular Gender-Event populations by access
+    # -----------------------------------------------------------------
+    psych_df = df[df["event_type"] == "psych_query"].copy()
+    if not psych_df.empty:
+        psych_details = psych_df["detail"].fillna("").apply(parse_detail)
+        psych_df["gender"] = psych_details.apply(lambda d: d.get("gender", ""))
+        psych_df["event"] = psych_details.apply(lambda d: d.get("event", ""))
+
+        psych_gender_event_counts = (
+            psych_df.groupby(["gender", "event"])
+            .size()
+            .reset_index(name="hits")
+            .sort_values("hits", ascending=False)
+        )
+        psych_gender_event_html = psych_gender_event_counts.to_html(
+            classes="table table-striped", index=False
+        )
+    else:
+        psych_gender_event_html = "<p>No Psych Rankings queries yet.</p>"
+
+    # ---------------------------------------------------------
+    # 4) Psych Rankings: most popular teams (team search hits)
+    # ---------------------------------------------------------
+    team_search_df = df[df["event_type"] == "team_search"].copy()
+    if not team_search_df.empty:
+        team_details = team_search_df["detail"].fillna("").apply(parse_detail)
+        team_search_df["team"] = team_details.apply(lambda d: d.get("team", ""))
+
+        psych_team_counts = (
+            team_search_df.groupby("team")
+            .size()
+            .reset_index(name="hits")
+            .sort_values("hits", ascending=False)
+        )
+        psych_team_html = psych_team_counts.to_html(
+            classes="table table-striped", index=False
+        )
+    else:
+        psych_team_html = "<p>No team searches yet.</p>"
+
+    # ---------------------------------------------------
+    # 5) Team / Insights / Usage pageviews
+    # ---------------------------------------------------
+    pageviews = []
+    for route in ["/team", "/insights", "/usage"]:
+        count = df[(df["event_type"] == "page_view") & (df["route"] == route)].shape[0]
+        pageviews.append({"route": route, "pageviews": count})
+
+    pageviews_df = pd.DataFrame(pageviews)
+    pageviews_html = pageviews_df.to_html(classes="table table-striped", index=False)
+
+    # ---------------------------------------------------
+    # 6) IPs and total accesses
+    # ---------------------------------------------------
+    ip_counts = (
+        df.groupby("client_id")["event_type"]
+        .count()
+        .reset_index(name="hits")
+        .sort_values("hits", ascending=False)
+    )
+    ip_counts_html = ip_counts.to_html(classes="table table-striped", index=False)
+
+    # NOTE: For geographic location ("where they're from"), you'd need to
+    # run these IPs through a GeoIP service or database (e.g., ipinfo,
+    # MaxMind GeoLite2, etc.). That's external to this app and usually
+    # requires an API key or local DB, so here we just list the IPs +
+    # hit counts.
+
+    return render_template(
+        'usage.html',
+        title='Usage Statistics',
+        year=datetime.now().year,
+        version=VERSION_NUMBER,
+        summary_html=summary_html,
+        routes_html=routes_html,
+        daily_html=daily_html,
+        power_gender_event_html=power_gender_event_html,
+        power_name_html=power_name_html,
+        psych_gender_event_html=psych_gender_event_html,
+        psych_team_html=psych_team_html,
+        pageviews_html=pageviews_html,
+        ip_counts_html=ip_counts_html,
+    )

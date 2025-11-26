@@ -1022,7 +1022,7 @@ for row in rescored_df:
 
         # Double Points for Relays
         if "x" in event:
-            points *= 2
+            points *= RELAY_SCORE_MODIFIER
 
         row.append(points)
     else:

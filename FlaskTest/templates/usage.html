@@ -1,0 +1,38 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+
+<h3>Summary</h3>
+{{ summary_html|safe }}
+
+<h3>Pageviews by Route</h3>
+{{ routes_html|safe }}
+
+<h3>Pageviews by Day</h3>
+{{ daily_html|safe }}
+
+<hr>
+
+<h3>Power Rankings – Gender × Event popularity</h3>
+{{ power_gender_event_html|safe }}
+
+<h3>Power Rankings – Most searched names</h3>
+{{ power_name_html|safe }}
+
+<h3>Psych Sheets – Gender × Event popularity</h3>
+{{ psych_gender_event_html|safe }}
+
+<h3>Psych Rankings – Most searched teams</h3>
+{{ psych_team_html|safe }}
+
+<hr>
+
+<h3>Team / Insights / Usage pageviews</h3>
+{{ pageviews_html|safe }}
+
+<h3>IP addresses by total accesses</h3>
+{{ ip_counts_html|safe }}
+
+{% endblock %}
