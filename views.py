@@ -511,7 +511,7 @@ def usage_log_download():
 
     # Send the CSV as a download
     return send_from_directory(
-        directory='.',
-        path=ANALYTICS_LOG,
+        '.',
+        ANALYTICS_LOG,
         as_attachment=True
     )
