@@ -195,8 +195,8 @@ def team():
     womens_team_rankings, mens_team_rankings = USPORTSDataManager.ProvideTeamRankings()
 
     # Convert to pandas DataFrame
-    womens_df = pd.DataFrame(womens_team_rankings, columns=['Rank', 'Team', 'Score'])
-    mens_df = pd.DataFrame(mens_team_rankings, columns=['Rank', 'Team', 'Score'])
+    womens_df = pd.DataFrame(womens_team_rankings, columns=['Rank', 'Team', 'Score', 'Conference'])
+    mens_df = pd.DataFrame(mens_team_rankings, columns=['Rank', 'Team', 'Score', 'Conference'])
 
     # Convert DataFrame to HTML
     womens_html = womens_df.to_html(classes='table table-striped sortable', index=False)

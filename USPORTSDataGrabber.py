@@ -119,6 +119,48 @@ if RUN_MODE == RUN_MODE_USPORTS:
         ]
     }
 
+    DICT_OF_CONFERENCES_BY_TEAM = {
+        # ATLANTIC UNIVERSITY SPORT
+        "Acadia University" : "AUS",
+        "Dalhousie University" : "AUS",
+        "Memorial University of Newfoundland" : "AUS",
+        "Université de Moncton" : "AUS",
+        "Mount Allison University" : "AUS",
+        "University of New Brunswick" : "AUS",
+        "University of Prince Edward Island" : "AUS",
+
+        # CANADA WEST
+        "University of Alberta" : "CW",
+        "University of British Columbia" : "CW",
+        "University of Calgary" : "CW",
+        "University of Lethbridge" : "CW",
+        "University of Manitoba" : "CW",
+        "University of Regina" : "CW",
+        "University of Victoria" : "CW",
+
+        # ONTARIO UNIVERSITY ATHLETICS
+        "Brock University" : "OUA",
+        "Carleton University" : "OUA",
+        "University of Guelph" : "OUA",
+        "Laurentian University" : "OUA",
+        "McMaster University" : "OUA",
+        "Queen's University" : "OUA",
+        "University of Toronto" : "OUA",
+        "Trent University" : "OUA",
+        "University of Waterloo" : "OUA",
+        "Western University" : "OUA",
+        "Wilfrid Laurier University" : "OUA",
+        "York University" : "OUA",
+
+        # RÉSEAU DU SPORT ÉTUDIANT DU QUÉBEC
+        "Université Laval" : "RSEQ",
+        "McGill University" : "RSEQ",
+        "Université de Montréal" : "RSEQ",
+        "University of Ottawa/Université d'Ottawa" : "RSEQ",
+        "Université du Québec à Trois-Rivières" : "RSEQ",
+        "Université de Sherbrooke" : "RSEQ"
+    }
+
 # Canada West Version
 elif RUN_MODE == RUN_MODE_CANADA_WEST:
     DICT_OF_TEAMS_BY_CONFERENCE = {
@@ -135,6 +177,17 @@ elif RUN_MODE == RUN_MODE_CANADA_WEST:
         ]
     }
 
+    DICT_OF_CONFERENCES_BY_TEAM = {
+        # CANADA WEST
+        "University of Alberta" : "CW",
+        "University of British Columbia" : "CW",
+        "University of Calgary" : "CW",
+        "University of Lethbridge" : "CW",
+        "University of Manitoba" : "CW",
+        "University of Regina" : "CW",
+        "University of Victoria" : "CW",
+    }
+
 # McGill Version
 elif RUN_MODE == RUN_MODE_MCGILL:
     DICT_OF_TEAMS_BY_CONFERENCE = {
@@ -143,6 +196,11 @@ elif RUN_MODE == RUN_MODE_MCGILL:
         [
         "McGill University"
         ]
+    }
+
+    DICT_OF_CONFERENCES_BY_TEAM = {
+        # RÉSEAU DU SPORT ÉTUDIANT DU QUÉBEC
+        "McGill University" : "RSEQ"
     }
 
 TEAMS_TO_CONFERENCES = {}
@@ -808,6 +866,7 @@ def GenerateClubResultsDatabase():
 ## Step 0: See if there has been any progress made... If there is, start there.
 ## Step 1: Get a list of U SPORTS swimmers
 results_db, athlete_ids = GenerateResultsDatabase()
+print("Done Step 1/10")
 
 ## Step 2: Output to CSV Files
 results_df = pd.DataFrame(results_db, columns=['Athlete ID', 'Gender', 'Event', 'Course', 'Team', 'Conference', 'Name', 'Time', 'AQUA'])
@@ -816,11 +875,13 @@ results_df.to_csv(RESULTS_DB_FILENAME, index=False)
 athlete_ids_df = pd.DataFrame(athlete_ids, columns=['Athlete_ID', 'Team'])
 athlete_ids_df.to_csv(ATHLETE_IDS_FILENAME, index=False)
 print("Varsity Results Database Created")
+print("Done Step 2/10")
 
 ## Step 2.5 (Dec 16th, 2024 - Jan 25th, 2024): Get Club Results. Not every swimmer always represents their varsity tag, so we use their Swimrankings ID to get their PBs from this season.
 print("Generating Club Database")
 club_results_db = GenerateClubResultsDatabase()
 print("Club Results Database Generated")
+print("Done Step 2.5/10")
 
 ## Step 2.75 (Jan 25th, 2024): Update Results with Club Results
 # Load varsity results
@@ -872,6 +933,8 @@ with open(COMBINED_RESULTS_DB_FILENAME, "w", newline="") as file:
     writer = csv.writer(file)
     writer.writerow(varsity_header)  # Write header
     writer.writerows(combined_df)    # Write updated results
+
+print("Done Step 2.75/10")
 
 ## Step 3: Provide Individual Events Filtering, Ranking, and Scoring
 # Sort results by gender, event, course, and then time. Then, score them.
@@ -986,7 +1049,9 @@ for team in relay_teams:
 
 rescored_df = top_individual_swims + top_relay_swims
 
-## Step 3: Provide Individual Events Re-Ranking and Re-Scoring
+print("Done Step 3/10")
+
+## Step 4: Provide Individual Events Re-Ranking and Re-Scoring
 # Sort rescored by Gender, Event, Course, and then Time
 rescored_df.sort(key=lambda x: (x[1], x[2], x[3], float(timeToSec(x[7]))))  # Assuming Time is in column 5
 
@@ -1036,12 +1101,16 @@ with open(RESTRICTED_EVENT_SCORING_DB_FILENAME, 'w', newline='') as file:
     writer.writerow(["Athlete ID", "Gender", "Event", "Course", "Team", "Conference", "Name", "Time", "AQUA", "Old Place", "Old Score", "Group", "New Place", "New Score"])  # Header
     writer.writerows(rescored_df)
 
-## Step 4: Provide Team Events Scoring
+print("Done Step 4/10")
+
+## Step 5: Provide Team Events Scoring
 # Step 5: Load event_scoring_df into team_scoring_df
 with open(RESTRICTED_EVENT_SCORING_DB_FILENAME, 'r') as file:
     reader = csv.reader(file)
     next(reader)  # Skip header
     team_scoring_df = [row for row in reader]
+
+print("Done Step 5/10")
 
 # Step 6: Aggregate scores by team
 CLUB_EVENT_TOTAL = "TOTAL"
@@ -1053,6 +1122,7 @@ for row in team_scoring_df:
     gender = row[1]
     event = row[2]
     club = row[4]
+    conference = row[5]
     score = int(row[13])
     group = row[11]
     
@@ -1096,6 +1166,8 @@ for row in team_scoring_df:
             womens_club_scores[club][event] = score
             womens_club_scores[club][CLUB_EVENT_TOTAL] = score
 
+print("Done Step 6/10")
+
 # Step 7: Rank the clubs by total score (using CLUB_EVENT_TOTAL)
 ranked_clubs = sorted(club_scores.items(), key=lambda x: x[1].get(CLUB_EVENT_TOTAL, 0), reverse=True)
 ranked_mens_clubs = sorted(mens_club_scores.items(), key=lambda x: x[1].get(CLUB_EVENT_TOTAL, 0), reverse=True)
@@ -1116,33 +1188,35 @@ with open(TEAM_SCORING_DB_FILENAME, mode='w', newline='') as file:
     writer = csv.writer(file)
     
     # Write the header
-    writer.writerow(['Rank', 'Team', 'Score'])
+    writer.writerow(['Rank', 'Team', 'Score', 'Conference'])
     
     # Write the rows with rank prepended
     for rank, club, score in ranked_clubs_with_scores_with_ranks:
-        writer.writerow([rank, club, score])
+        writer.writerow([rank, club, score, DICT_OF_CONFERENCES_BY_TEAM[SWIMRANKINGS_CLUB_TO_TEAM[club]]])
 
 # Open the CSV file in write mode
 with open(MENS_TEAM_SCORING_DB_FILENAME, mode='w', newline='') as file:
     writer = csv.writer(file)
     
     # Write the header
-    writer.writerow(['Rank', 'Team', 'Score'])
+    writer.writerow(['Rank', 'Team', 'Score', 'Conference'])
     
     # Write the rows with rank prepended
     for rank, club, score in ranked_mens_clubs_with_scores_with_ranks:
-        writer.writerow([rank, club, score])
+        writer.writerow([rank, club, score, DICT_OF_CONFERENCES_BY_TEAM[SWIMRANKINGS_CLUB_TO_TEAM[club]]])
 
 # Open the CSV file in write mode
 with open(WOMENS_TEAM_SCORING_DB_FILENAME, mode='w', newline='') as file:
     writer = csv.writer(file)
     
     # Write the header
-    writer.writerow(['Rank', 'Team', 'Score'])
+    writer.writerow(['Rank', 'Team', 'Score', 'Conference'])
     
     # Write the rows with rank prepended
     for rank, club, score in ranked_womens_clubs_with_scores_with_ranks:
-        writer.writerow([rank, club, score])
+        writer.writerow([rank, club, score, DICT_OF_CONFERENCES_BY_TEAM[SWIMRANKINGS_CLUB_TO_TEAM[club]]])
+
+print("Done Step 7/10")
 
 # Step 8: Aggregate scores by club and group
 club_group_scores = {}
@@ -1167,12 +1241,14 @@ for row in team_scoring_df:
             club_group_scores[club] = {group: score}
     else:
         continue
+print("Done Step 8/10")
 
 # Step 9: Prepare the breakdown data for CSV
 breakdown_data = []
 for club, group_scores in club_group_scores.items():
     for group_event, score in group_scores.items():
         breakdown_data.append([club, group_event, score])
+print("Done Step 9/10")
 
 # Step 10: Write the breakdown data to TEAM_BREAKDOWN_DB_FILENAME
 with open(TEAM_BREAKDOWN_DB_FILENAME, mode='w', newline='') as file:
@@ -1184,4 +1260,5 @@ with open(TEAM_BREAKDOWN_DB_FILENAME, mode='w', newline='') as file:
     # Write the breakdown rows
     writer.writerows(breakdown_data)
 
+print("Done Step 10/10")
 print("Done!")
