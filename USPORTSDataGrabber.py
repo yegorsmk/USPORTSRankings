@@ -33,8 +33,8 @@ def build_swimrankings_session():
     # IMPORTANT: paste your **current** cookies from the working curl here.
     # At minimum, keep cf_clearance + PHPSESSID. These are examples/placeholder values.
     s.cookies.update({
-        "PHPSESSID": "cgd10ma1t9ldumfk6n3s7da2hu",
-        "cf_clearance": "CLNb3jlMOf8OUZL2KTm2zEC5kvZEnl8cjlHRdm6O..4-1764031076-1.2.1.1-AdlG7uz1LHEKDidk1mffi3hcBaCHfOQwGt7vNLHW7vXEfHDNwz7huWmPy4a92Ko9blwLvQ3o9WgBKj3dmv3d88IRAQ3WgBlhsPIbUQpm1hjKgP3pXmc_TNF_5QTkDdZw2HfdhIyk0Z.B5UUxEIczSlEsr1QvTpv64Ch7ob9kL6uYoM6P4w8RDNQYdabBQAJ7HGMcr9ewHRsKWZewF6V3mJRVaUNX5ilLFHLJEp9r6zo",
+        "PHPSESSID": "dkgf53gr4dr5jbvmsa0g5fgt4h",
+        "cf_clearance": "nUGOzS8dKanZM67KG.tEGvOjWaOxFWtPRtk3JSYffV4-1764683606-1.2.1.1-3A0WrSqG6RnPw6sr1Lct.QKg_ukPGnhQz4mcYsAlYAKQFGcDPAzEbaeecg9Opneeun6b5Ft4TiZXSm_3mNcVaifgHadJ3lDT8W6AdQePk4huvvhiQeW6DLiLveVIQIyqfw3C08yooOrHB3KuOHvQhTY2BV75UhczInoF61cGOjsrIEz50AWdW5vsfzkkgKrQbm3OXtXR64g2E9MddWX.IwJqNTkDn.HSPZRLV36BOGo",
         "accept-tracking": "1",
         "shw": "1600:2560",
         # _ga etc are optional; you can include them if you want
@@ -69,11 +69,11 @@ if RUN_MODE == RUN_MODE_USPORTS:
         # ATLANTIC UNIVERSITY SPORT
         "AUS":
         [
-        #"Acadia University",                    # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        #"Acadia University",                   # RIP
         "Dalhousie University",                 # Current
-        #"Memorial University of Newfoundland",  # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        "Memorial University of Newfoundland",  # Current
         #"Université de Moncton",
-        #"Mount Allison University",             # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        "Mount Allison University",             # Current
         "University of New Brunswick",          # Current
         #"University of Prince Edward Island"
         ],
@@ -236,6 +236,7 @@ LIST_OF_SCORING_EVENTS_BY_GENDER = {
         "200m Medley",
         "400m Medley",
         "4 x 100m Freestyle",
+        "4 x 200m Freestyle",
         "4 x 100m Medley"
     ],
     GENDER_WOMEN : [
@@ -256,11 +257,12 @@ LIST_OF_SCORING_EVENTS_BY_GENDER = {
         "200m Medley",
         "400m Medley",
         "4 x 100m Freestyle",
+        "4 x 200m Freestyle",
         "4 x 100m Medley"
     ]
 }
 
-LIST_OF_SCORED_RELAY_EVENTS = ["4 x 100m Freestyle", "4 x 100m Medley"]
+LIST_OF_SCORED_RELAY_EVENTS = ["4 x 100m Freestyle", "4 x 200m Freestyle", "4 x 100m Medley"]
 
 CONFERENCES = DICT_OF_TEAMS_BY_CONFERENCE.keys()
 
@@ -268,11 +270,11 @@ SWIMRANKINGS_CLUB_STEM = "https://www.swimrankings.net/index.php?page=rankingDet
 
 if RUN_MODE == RUN_MODE_USPORTS:
     TEAM_TO_SWIMRANKINGS_CLUB = {
-        #"Acadia University" : "ACAD",                   # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        #"Acadia University" : "ACAD",                   # RIP
         "Dalhousie University" : "DAL",                 # Current
-        #"Memorial University of Newfoundland" : "MUSC", # NOT UPDATED FOR 2025/2026 - CHECK BACK
-        #"Université de Moncton" : None,
-        #"Mount Allison University" : "MTA",             # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        "Memorial University of Newfoundland" : "MUSC", # Current
+    #"Université de Moncton" : None,
+        #"Mount Allison University" : "MTA",             # Current
         #"University of Prince Edward Island" : None,
         #"University of Alberta" : "UOFA",              # RIP
         "University of British Columbia" : "UBCT",      # Current
@@ -302,11 +304,11 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "Université de Sherbrooke"  : "USHER"           # Current
     }
     SWIMRANKINGS_CLUB_TO_TEAM = {
-        #"ACAD": "Acadia University",   # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        "ACAD": "Acadia University",   # RIP
         "DAL": "Dalhousie University",
-        #"MUSC": "Memorial University of Newfoundland", # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        "MUSC": "Memorial University of Newfoundland", # Current
         # "None": "Université de Moncton",
-        #"MTA": "Mount Allison University", # NOT UPDATED FOR 2025/2026 - CHECK BACK
+        "MTA": "Mount Allison University", # Current
         # "None": "University of Prince Edward Island",
         # "UOFA": "University of Alberta",
         "UBCT": "University of British Columbia",
@@ -320,7 +322,6 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "UG": "University of Guelph",
         # "LU": "Laurentian University",
         "MACU": "McMaster University",
-        "OTT": "University of Ottawa/Université d'Ottawa",
         "UNB": "University of New Brunswick",
         "QUE": "Queen's University",
         "UT": "University of Toronto",
@@ -329,6 +330,7 @@ if RUN_MODE == RUN_MODE_USPORTS:
         "WES": "Western University",
         "WLU": "Wilfrid Laurier University",
         "YU": "York University",
+        "OTT": "University of Ottawa/Université d'Ottawa",
         "ULAVAL": "Université Laval",
         "MCGILL": "McGill University",
         "UDEM": "Université de Montréal",
