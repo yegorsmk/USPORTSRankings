@@ -21,8 +21,8 @@ import USPORTSDataManager
 
 from datetime import date
 
-DATE_OF_LAST_UPDATE = "December 9th, 2025" 
-VERSION_NUMBER = "1.03 - WEEK 3"
+DATE_OF_LAST_UPDATE = "December 16th, 2025" 
+VERSION_NUMBER = "1.04 - WEEK 4 - MERRY CHRISTMAS!"
 ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
 USAGE_PASSWORD = "REMOVED_PASSWORD"
