@@ -482,7 +482,7 @@ CLUB_RESULTS_URL_SUFFIX = "&pbest=" + str(USPORTS_YEAR)
 
 EXEMPT_IDS = []
 #EXEMPT_IDS = ["4342739", "5627823", "4786149", "5339517", "4073747"]
-EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697"]  # Foreign kids that don't have Swimrankings Athlete page functionality
+EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697", "4969912"]  # Foreign kids that don't have Swimrankings Athlete page functionality
 
 DO_NOT_COLLECT_IDS = ["4454358", "4596667", "4570202"]  # Finlay Knox, Blake Tierney, Hugh McNeill
 
