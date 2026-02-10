@@ -33,8 +33,8 @@ def build_swimrankings_session():
     # IMPORTANT: paste your **current** cookies from the working curl here.
     # At minimum, keep cf_clearance + PHPSESSID. These are examples/placeholder values.
     s.cookies.update({
-        "PHPSESSID": "ug106iiqn4b7n04uuio06natt4",
-        "cf_clearance": "clYFNSInsEYtdmXU_bFaSUdqh._tN17mJz2mhteqnmQ-1765242564-1.2.1.1-o4uR8gNVTU6dteAvtlxI_XGP3Iwk23dWSj4g5doQNskRqfhwkaEd7p67JkEul.cNC400g4KpldfQ1cevJLDtDdYhvPSAum1SQZssLA7c_SSsKm4xzosTaNJ8vEjqdP5Y.l6S0CfGNGO9zzhvwWqJiVGVoyalOFjj1WK5dvUT97vNnyfBs..lDiCFf_VlGELDbkH6WyMlT71ph6SgzF3J1tPQAWahGCHS2vukjPYdIR8",
+        "PHPSESSID": "jtl12masq8u2tpt97t0k7ric08",
+        "cf_clearance": "PKhp8Jj9uoZpDLmTIQm88BjDLN56qf8XY0a5yy_sCMI-1770665898-1.2.1.1-eEnSmKJQonwu4rUrcUoMqJZV99tVky2mS1JFfCPbiKoyB5qb9aQMAaMpz.DO3yoUGW9tTYI5GjyZaqelswsH3QBmQaTqwPOf33briZQUYjXuJ2cEXUGw2gqwKX8xAp5l6ihc0BSGbhBFdrQaRlo2wm.Rm7XSKCEJ04dc4nm4BXyS11mb.ovbHlrHk3lQWJ9SKdshN7gg_Vc4yZAssduw.gH_9P7P5XBhrdUtAjcaN6w",
         "accept-tracking": "1",
         "shw": "1600:2560",
         # _ga etc are optional; you can include them if you want
