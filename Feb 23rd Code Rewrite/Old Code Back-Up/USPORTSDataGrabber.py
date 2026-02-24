@@ -22,19 +22,23 @@ def build_swimrankings_session():
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/142.0.0.0 Safari/537.36"
+            "Chrome/122.0.0.0 Safari/537.36"
         ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,"
-                  "image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Referer": "https://www.swimrankings.net/",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
         "Upgrade-Insecure-Requests": "1",
+        "Connection": "keep-alive"
     })
 
     # IMPORTANT: paste your **current** cookies from the working curl here.
     # At minimum, keep cf_clearance + PHPSESSID. These are examples/placeholder values.
     s.cookies.update({
-        "PHPSESSID": "jtl12masq8u2tpt97t0k7ric08",
-        "cf_clearance": "PKhp8Jj9uoZpDLmTIQm88BjDLN56qf8XY0a5yy_sCMI-1770665898-1.2.1.1-eEnSmKJQonwu4rUrcUoMqJZV99tVky2mS1JFfCPbiKoyB5qb9aQMAaMpz.DO3yoUGW9tTYI5GjyZaqelswsH3QBmQaTqwPOf33briZQUYjXuJ2cEXUGw2gqwKX8xAp5l6ihc0BSGbhBFdrQaRlo2wm.Rm7XSKCEJ04dc4nm4BXyS11mb.ovbHlrHk3lQWJ9SKdshN7gg_Vc4yZAssduw.gH_9P7P5XBhrdUtAjcaN6w",
+        "PHPSESSID": "8bk5ta3cj96o0h86kok60sjg3u",
+        "cf_clearance": "BJ.R.BI.HyfHXYdTZrVAFk1QFrAbqjQQq3Hog.w7FE4-1771858056-1.2.1.1-5oSRXzE83QaZUEVGbDjjVITOYxdM.kPE9TeCBkAgjw0AbwDnjHQkLU4hpz1W4GQealCKoUjF3I.nEYq4jGi7PoTEF1NAYwthNDx7_iG9p1N1cUkbalTQSsEfpJkVWoeVS3_BMoFtbVAiF0qSfk_A_FdlwUpUl6ZA4ZkN3WXFcj3y_WJZAmX8fJOKOc3jSwYcuc.vtlpDpPVIJWYzUJEMqVEzCQjAvWtZJetQMj42Bww",
         "accept-tracking": "1",
         "shw": "1600:2560",
         # _ga etc are optional; you can include them if you want
@@ -50,6 +54,12 @@ def safe_get(url, session=SWIMRANKINGS_SESSION, label=""):
     if resp.status_code == 200:
         print(f"Successfully loaded page {label or ''} -> {url}")
         return resp
+    elif resp.status_code == 403:
+        # Hard fail so you notice it's a block and not “empty” data
+        raise RuntimeError(
+            f"Got 403 from Swimrankings on {label or url}. "
+            "Cloudflare is blocking you again – refresh cf_clearance / cookies from your browser."
+        )
     elif resp.status_code == 503:
         # Hard fail so you notice it's a block and not “empty” data
         raise RuntimeError(
