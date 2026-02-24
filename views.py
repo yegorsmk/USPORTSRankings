@@ -22,7 +22,7 @@ import USPORTSDataManager
 from datetime import date
 
 DATE_OF_LAST_UPDATE = "February 24th 2026 - OUAs and RSEQ are in! Swimrankings was blocking my code so I had to do a full rewrite - let me know if there are any issues." 
-VERSION_NUMBER = "2.10 - WEEK 10"
+VERSION_NUMBER = "2.10.1 - WEEK 10"
 ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
 USAGE_PASSWORD = "REMOVED_PASSWORD"
