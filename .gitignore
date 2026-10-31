@@ -1,0 +1,34 @@
+# Secrets and environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+build/
+dist/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Logs and runtime data
+*.log
+instance/
+usage_log.csv
+
+# Generated data: regenerate with NEWUSPORTSDataMerger.py
+# Swimrankings exports and archived reports contain athlete names and birthdates
+*.csv
+*.xlsx
+*progress_tracker.txt
