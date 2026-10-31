@@ -18,6 +18,9 @@ import signal
 import csv
 
 import USPORTSDataManager
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from datetime import date
 
@@ -25,10 +28,11 @@ DATE_OF_LAST_UPDATE = "March 2nd 2026"
 VERSION_NUMBER = "2.11 - WEEK 11"
 ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
-USAGE_PASSWORD = "REMOVED_PASSWORD"
+USAGE_PASSWORD = os.getenv("USAGE_PASSWORD")
 
 def usage_auth_required():
-    return request.args.get("pwd", "") == USAGE_PASSWORD
+    # Fail closed: if USAGE_PASSWORD is not set, nobody gets in
+    return USAGE_PASSWORD is not None and request.args.get("pwd", "") == USAGE_PASSWORD
 
 def _get_client_fingerprint():
     """
