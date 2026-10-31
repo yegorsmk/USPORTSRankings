@@ -265,8 +265,8 @@ if RUN_MODE == RUN_MODE_USPORTS:
         #"Acadia University" : "ACAD",                   # RIP
         "Dalhousie University" : "DAL",                 # Current
         "Memorial University of Newfoundland" : "MUSC", # Current
-    #"Universite de Moncton" : None,
-        #"Mount Allison University" : "MTA",             # Current
+        #"Universite de Moncton" : None,
+        "Mount Allison University" : "MTA",             # Current
         #"University of Prince Edward Island" : None,
         #"University of Alberta" : "UOFA",              # RIP
         "University of British Columbia" : "UBCT",      # Current
