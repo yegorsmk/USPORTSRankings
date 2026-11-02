@@ -24,8 +24,8 @@ load_dotenv()
 
 from datetime import date
 
-DATE_OF_LAST_UPDATE = "March 2nd 2026"
-VERSION_NUMBER = "2.11 - WEEK 11"
+DATE_OF_LAST_UPDATE = "October 30, 2026"
+VERSION_NUMBER = "3.1 - WEEK 1"
 ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
 USAGE_PASSWORD = os.getenv("USAGE_PASSWORD")

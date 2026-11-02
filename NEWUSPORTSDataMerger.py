@@ -469,7 +469,7 @@ MAXIMUM_SCORED_RELAYS_PER_TEAM_AND_GENDER = 1
 
 EXEMPT_IDS = []
 #EXEMPT_IDS = ["4342739", "5627823", "4786149", "5339517", "4073747"]
-EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697", "4969912"]  # Foreign kids that don't have Swimrankings Athlete page functionality
+#EXEMPT_IDS = ["5492416", "5753229", "4908307", "5394238", "5029821", "5532239", "5192697", "4969912"]  # Foreign kids that don't have Swimrankings Athlete page functionality
 
 DO_NOT_COLLECT_IDS = ["4454358", "4596667", "4570202"]  # Finlay Knox, Blake Tierney, Hugh McNeill
 
@@ -486,27 +486,10 @@ def save_to_progress_tracker(filename, club_name):
         file.write(club_name + "\n")
 
 def GenerateResultsDatabase():
+    # Always rebuild from INPUT. Loading the previous OUTPUT file here
+    # would append every run's rows onto the last run's rows.
     results_db = []
-    try:
-        with open(RESULTS_DB_FILENAME, "r") as file:
-            reader = csv.reader(file)
-            next(reader)
-            results_db = [row for row in reader]
-            print("Loaded Results DB")
-    except FileNotFoundError:
-        results_db = []
-        print("Could not load Results DB")
-
     athlete_ids = []
-    try:
-        with open(ATHLETE_IDS_FILENAME, "r") as file:
-            reader = csv.reader(file)
-            next(reader)
-            athlete_ids = [row for row in reader]
-            print("Loaded Athlete IDs DB")
-    except FileNotFoundError:
-        athlete_ids = []
-        print("Could not load Athlete IDs DB")
 
     # --- NEW SECTION START ---
     # Path to folder containing your .xlsx files
@@ -955,7 +938,7 @@ for row in event_scoring_df:
 from operator import itemgetter
 
 top_individual_swims = []
-for individual_athlete in individual_athletes:
+for individual_athlete in sorted(individual_athletes):  # sorted: set order changes between runs
     athlete_swims = [row for row in event_scoring_df if row[6] == individual_athlete]
     
     # Sort by Score (Descending), then AQUA (Descending), then Time (Ascending)
@@ -967,7 +950,7 @@ for individual_athlete in individual_athletes:
 # Get Top 1 Swim for Each Relay
 top_relay_swims = []
 
-for team in relay_teams:
+for team in sorted(relay_teams):
     for gender in [GENDER_MEN, GENDER_WOMEN]:
         for relay_event in LIST_OF_SCORED_RELAY_EVENTS:
             # collect all relay swims for (team, gender, relay_event)
