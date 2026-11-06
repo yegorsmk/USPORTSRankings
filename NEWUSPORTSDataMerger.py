@@ -473,6 +473,15 @@ EXEMPT_IDS = []
 
 DO_NOT_COLLECT_IDS = ["4454358", "4596667", "4570202"]  # Finlay Knox, Blake Tierney, Hugh McNeill
 
+# Nov 6th, 2026: Swims at foreign clubs aren't in the Canada-level report, so they are typed in by hand
+MANUAL_RESULTS_FILENAME = "./INPUT/manual_results.xlsx"
+MANUAL_RESULTS_SHEET = "Results"
+
+# Nov 6th, 2026: International swimmers who scored last season, worth checking on Swimrankings by hand
+PREVIOUS_SEASON_REPORT_FOLDER = "./2025-2026 Season/March 3rd Report/"
+WATCHLIST_PLACE_CUTOFF = 24
+WATCHLIST_FILENAME = OUTPUT_PREFIX + "watchlist.csv"
+
 ### CLASSES AND METHODS ###
 def load_progress_tracker(filename):
     try:
@@ -759,6 +768,116 @@ def GenerateClubResultsDatabase():
 
     return club_df.values.tolist()
 
+def LoadManualResults(athlete_to_varsity_team):
+    # Reads swims typed into MANUAL_RESULTS_FILENAME and returns them as Combined Results rows
+    if not os.path.exists(MANUAL_RESULTS_FILENAME):
+        print("No manual results file found; skipping")
+        return []
+
+    df = pd.read_excel(MANUAL_RESULTS_FILENAME, sheet_name=MANUAL_RESULTS_SHEET, dtype={"Time": str})
+    df = df.dropna(how="all")
+
+    manual_rows = []
+    for index, row in df.iterrows():
+        excel_row = index + 2  # +1 for the header, +1 because Excel counts from 1
+        athlete_name = str(row["Name"]).strip()
+        gender = str(row["Gender"]).strip()
+        event_name = str(row["Event"]).strip()
+
+        try:
+            # Match the Athlete ID format built from the Swimrankings reports
+            athlete_birthdate = str(pd.to_datetime(row["Birthdate"]))
+            swimtime = timeToSec(str(row["Time"]).strip())
+        except Exception:
+            print(f"⚠️ Manual results row {excel_row}: unreadable Birthdate or Time; skipping")
+            continue
+
+        if gender not in GENDERS or event_name not in LIST_OF_SCORING_EVENTS_BY_GENDER[gender]:
+            print(f"⚠️ Manual results row {excel_row}: unknown Gender/Event '{gender} {event_name}'; skipping")
+            continue
+
+        athlete_id = f"{athlete_name}_{athlete_birthdate}"
+
+        # Prefer the team they swim for this season, fall back to the Team column
+        if athlete_id in athlete_to_varsity_team:
+            club_code = athlete_to_varsity_team[athlete_id]
+        else:
+            club_code = str(row["Team"]).strip()
+            print(f"ℹ️ Manual results row {excel_row}: {athlete_name} has no varsity swims yet, using Team '{club_code}'")
+
+        if club_code not in SWIMRANKINGS_CLUB_TO_TEAM:
+            print(f"⚠️ Manual results row {excel_row}: unknown Team '{club_code}'; skipping")
+            continue
+
+        conference_name = DICT_OF_CONFERENCES_BY_TEAM[SWIMRANKINGS_CLUB_TO_TEAM[club_code]]
+        aqua_points = int(row["AQUA"]) if pd.notna(row["AQUA"]) else 0
+
+        manual_rows.append([
+            athlete_id,
+            gender,
+            event_name,
+            COURSE_SCM,
+            club_code,
+            conference_name,
+            athlete_name,
+            str(swimtime),  # Seconds, like SWIMTIME_N in the reports
+            aqua_points
+        ])
+
+    print(f"Loaded {len(manual_rows)} manual results")
+    return manual_rows
+
+def GenerateWatchlist(current_athlete_ids):
+    # Lists international swimmers who placed in the top WATCHLIST_PLACE_CUTOFF last season.
+    # Their swims at foreign clubs can't be pulled from Swimrankings reports, so check their profiles by hand.
+    previous_scoring_filename = os.path.join(PREVIOUS_SEASON_REPORT_FOLDER, EVENT_SCORING_DB_FILENAME)
+    if not os.path.exists(previous_scoring_filename):
+        print(f"⚠️ {previous_scoring_filename} not found; skipping watchlist")
+        return []
+
+    previous_df = pd.read_csv(previous_scoring_filename)
+    previous_df = previous_df[~previous_df["Event"].isin(LIST_OF_SCORED_RELAY_EVENTS)]
+    previous_df = previous_df[previous_df["Place"] <= WATCHLIST_PLACE_CUTOFF]
+
+    # Nationality comes from the Canada-level reports of both seasons
+    athlete_to_nation = {}
+    nation_files = (glob.glob(os.path.join(PREVIOUS_SEASON_REPORT_FOLDER, "INPUT", "CAN_*_17-99.xlsx")) +
+                    glob.glob(os.path.join("./INPUT/", "CAN_*_17-99.xlsx")))
+    for file_path in nation_files:
+        for df in pd.read_excel(file_path, sheet_name=None, header=1).values():
+            if "NATION" not in df.columns:
+                continue
+            for name, birthdate, nation in zip(df["FULLNAME"], df["BIRTHDATE"], df["NATION"]):
+                athlete_to_nation[f"{str(name).strip()}_{birthdate}"] = nation
+
+    watchlist = []
+    for athlete_id, swims in previous_df.groupby("Athlete ID"):
+        nation = athlete_to_nation.get(athlete_id, "?")
+        if nation == "CAN":
+            continue
+
+        best_swim = swims.sort_values("Place").iloc[0]
+        events = ", ".join(f"{e} ({p})" for e, p in zip(swims["Event"], swims["Place"]))
+        athlete_name, athlete_birthdate = athlete_id.rsplit("_", 1)
+        watchlist.append([
+            athlete_name,
+            athlete_birthdate.split(" ")[0],
+            nation,
+            best_swim["Team"],
+            "Yes" if athlete_id in current_athlete_ids else "No (graduated, or only swum abroad)",
+            events
+        ])
+
+    watchlist.sort(key=lambda x: x[0])
+    watchlist_df = pd.DataFrame(watchlist, columns=["Name", "Birthdate", "Nation", "Team", "Swum for varsity this season", f"Last season top {WATCHLIST_PLACE_CUTOFF} (Place)"])
+    watchlist_df.to_csv(WATCHLIST_FILENAME, index=False, encoding="utf-8")
+
+    print(f"\n👀 Watchlist: {len(watchlist)} international swimmers placed top {WATCHLIST_PLACE_CUTOFF} last season. Check their Swimrankings profiles:")
+    for row in watchlist:
+        print(f"   {row[0]} ({row[2]}, {row[3]}) born {row[1]}: {row[5]}" + ("" if row[4] == "Yes" else "  [not seen this season]"))
+    print(f"Saved to {WATCHLIST_FILENAME}\n")
+    return watchlist
+
 ### MAIN SECTION ###
 
 ## Step 0: See if there has been any progress made... If there is, start there.
@@ -844,6 +963,17 @@ for key, club_row in club_results.items():
             club_row[4] = athlete_to_varsity_team[athlete_id]
             club_row[5] = athlete_to_varsity_conf[athlete_id]
             combined_df.append(club_row)
+
+## Step 2.8 (Nov 6th, 2026): Add manual results (swims at foreign clubs), keeping whichever time is faster
+combined_index = {(r[0], r[1], r[2], r[3]): i for i, r in enumerate(combined_df)}
+for manual_row in LoadManualResults(athlete_to_varsity_team):
+    key = (manual_row[0], manual_row[1], manual_row[2], manual_row[3])
+    if key not in combined_index:
+        combined_index[key] = len(combined_df)
+        combined_df.append(manual_row)
+    elif timeToSec(manual_row[7]) < timeToSec(combined_df[combined_index[key]][7]):
+        combined_df[combined_index[key]] = manual_row
+print("Done Step 2.8/10")
 
 # Save combined results
 with open(COMBINED_RESULTS_DB_FILENAME, "w", newline="", encoding="utf-8") as file:
@@ -1179,4 +1309,7 @@ with open(TEAM_BREAKDOWN_DB_FILENAME, "w", newline="", encoding="utf-8") as file
     writer.writerows(breakdown_data)
 
 print("Done Step 10/10")
+
+## Step 11 (Nov 6th, 2026): Print the watchlist last so it isn't lost in the output above
+GenerateWatchlist(set(athlete_to_varsity_team))
 print("Done!")
