@@ -10,15 +10,14 @@
         <div class="row">
             <div class="col-md-12">
                 <h3>{{ message }}</h3>
-                <p><b>PROTIP:</b> This feature is in Alpha stage. Swimmer names will be LASTNAME Firstname like "SANCHEZ Kayla Noelle".</p>
+                <p><b>PROTIP:</b> Search by first name, last name, or both in any order, like "Kayla Sanchez" or "sanch". Capitals don't matter.</p>
                 <p>The following scores <b>do not</b> take <b>U SPORTS Entry Limits</b> (4 events per swimmer, 1 relay per team) into account.</p>
                 <p>For a reranking using <b>Top 4 swims</b>, please see the <a href="psych">Psych Rankings</a>.</p>
                 <hr>
                 <form method="POST">
                     <div class="col-md-12">
                         <h4>Name</h4>
-                        <input type="text" name="TARGET_NAME">
-                        </input>
+                        <input type="text" name="TARGET_NAME" value="{{ selected_name }}" required>
                     </div>
                     <br>
                     <div class="col-md-12">
@@ -30,6 +29,11 @@
     </body>
 
     <html>
+    {% if summary %}
+    <h4>Total Points</h4>
+    {{ summary|safe }}
+    <h4>Points by Event</h4>
+    {% endif %}
     {{ data|safe }}
     </html>
 </body>

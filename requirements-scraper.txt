@@ -1,0 +1,6 @@
+# Packages needed locally for the scraper and data merger (not deployed)
+-r requirements.txt
+requests==2.31.0
+beautifulsoup4==4.12.2
+openpyxl==3.1.5
+playwright

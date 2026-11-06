@@ -232,17 +232,32 @@ def nameSearch():
         name_results = USPORTSDataManager.ProvideNameResults(TARGET_NAME, TARGET_COURSE)
 
         # Convert rankings to a pandas DataFrame for better presentation
-        rankings_df = pd.DataFrame(name_results, columns=['Event', 'Time', 'AQUA', 'Place', 'Score'])
+        rankings_df = pd.DataFrame(name_results, columns=['Name', 'Team', 'Event', 'Time', 'AQUA', 'Place', 'Score'])
 
-        # Convert the DataFrame to HTML
-        rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
+        if rankings_df.empty:
+            message = f'No swimmers found matching "{TARGET_NAME}".'
+            summary_html = ""
+            rankings_html = ""
+        else:
+            # One row per matching swimmer with their total points across all events
+            summary_df = (rankings_df.groupby(['Name', 'Team'], as_index=False)
+                          .agg(Events=('Event', 'count'), **{'Total Score': ('Score', 'sum')})
+                          .sort_values('Total Score', ascending=False))
+            swimmer_count = len(summary_df)
+            message = f'{swimmer_count} swimmer{"s" if swimmer_count != 1 else ""} matching "{TARGET_NAME}" ({TARGET_COURSE})'
+
+            # Convert the DataFrames to HTML
+            summary_html = summary_df.to_html(classes='table table-striped sortable', index=False)
+            rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
             'namesearch.html',
             title='Unofficial U SPORTS Power Rankings as of ' + DATE_OF_LAST_UPDATE,
             year=datetime.now().year,
-            message=f"{TARGET_NAME}'s {TARGET_COURSE} Rankings",
+            message=message,
+            summary=summary_html,
             data=rankings_html,  # Pass the table as HTML to the template,
+            selected_name=TARGET_NAME,
             version=VERSION_NUMBER
         )
     else:  # GET request
