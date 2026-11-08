@@ -27,7 +27,7 @@ Thumbs.db
 instance/
 usage_log.csv
 
-# Generated data: regenerate with NEWUSPORTSDataMerger.py
+# Generated data: regenerate with run_merger.py
 # Swimrankings exports and archived reports contain athlete names and birthdates
 *.csv
 *.xlsx

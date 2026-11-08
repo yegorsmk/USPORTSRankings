@@ -17,7 +17,7 @@ import hashlib
 import signal
 import csv
 
-import USPORTSDataManager
+import data_manager
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -107,7 +107,7 @@ def parse_detail(detail_str: str) -> dict:
 
 @app.route('/')
 def home():
-    """Renders the home page."""
+    """Renders home page"""
     log_event("page_view", "/")
     return render_template(
         'index.html',
@@ -118,7 +118,7 @@ def home():
 
 @app.route('/insights')
 def insights():
-    """Renders the insights page."""
+    """Renders the insights page"""
     log_event("page_view", "/insights")
     return render_template(
         'insights.html',
@@ -129,7 +129,7 @@ def insights():
 
 @app.route('/power', methods=['GET', 'POST'])
 def power():
-    """Handles both rendering and form submission for the Individual Rankings page."""
+    """Handles both rendering and form submission for the Individual Rankings page"""
     if request.method == 'POST':
         TARGET_GENDER = request.form['TARGET_GENDER']
         TARGET_EVENT = request.form['TARGET_EVENT']
@@ -142,13 +142,13 @@ def power():
             detail=f"gender={TARGET_GENDER},event={TARGET_EVENT},course={TARGET_COURSE}"
         )
 
-        # Call ProvideIndividualRankings to get filtered rankings
-        power_rankings = USPORTSDataManager.ProvidePowerRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
+        # get filtered rankings
+        power_rankings = data_manager.ProvidePowerRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
-        # Convert rankings to a pandas DataFrame for better presentation
+        # convert rankings to a pandas DataFrame
         rankings_df = pd.DataFrame(power_rankings, columns=['Place', 'Name', 'Team', 'Conference', 'Time', 'AQUA', 'Score'])
 
-        # Convert the DataFrame to HTML
+        # convert the DataFrame to HTML
         rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
@@ -173,7 +173,7 @@ def power():
 
 @app.route('/psych', methods=['GET', 'POST'])
 def psych():
-    """Handles both rendering and form submission for the Psych Rankings page."""
+    """Handles both rendering and form submission for the Psych Rankings page"""
     if request.method == 'POST':
         TARGET_GENDER = request.form['TARGET_GENDER']
         TARGET_EVENT = request.form['TARGET_EVENT']
@@ -192,13 +192,10 @@ def psych():
             detail=f"gender={TARGET_GENDER},event={TARGET_EVENT},course={TARGET_COURSE}"
         )
 
-        # Call ProvideIndividualRankings to get filtered rankings
-        psych_rankings = USPORTSDataManager.ProvidePsychRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
+        psych_rankings = data_manager.ProvidePsychRankings(TARGET_GENDER, TARGET_EVENT, TARGET_COURSE)
 
-        # Convert rankings to a pandas DataFrame for better presentation
         rankings_df = pd.DataFrame(psych_rankings, columns=['Place', 'Name', 'Team', 'Conference', 'Time', 'AQUA', 'Score'])
 
-        # Convert the DataFrame to HTML
         rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
@@ -223,19 +220,19 @@ def psych():
 
 @app.route('/team')
 def team():
-    """Renders the Team Rankings report."""
+    """Renders the Team Rankings report"""
     log_event("page_view", "/team")
-    womens_team_rankings, mens_team_rankings = USPORTSDataManager.ProvideTeamRankings()
+    womens_team_rankings, mens_team_rankings = data_manager.ProvideTeamRankings()
 
-    # Convert to pandas DataFrame
+    # convert to pandas DataFrame
     womens_df = pd.DataFrame(womens_team_rankings, columns=['Rank', 'Team', 'Score', 'Conference'])
     mens_df = pd.DataFrame(mens_team_rankings, columns=['Rank', 'Team', 'Score', 'Conference'])
 
-    # Replace team codes with full names
+    # replace team codes with full names
     womens_df['Team'] = womens_df['Team'].map(TEAM_FULL_NAMES).fillna(womens_df['Team'])
     mens_df['Team'] = mens_df['Team'].map(TEAM_FULL_NAMES).fillna(mens_df['Team'])
 
-    # Convert DataFrame to HTML
+    # convert DataFrame to HTML
     womens_html = womens_df.to_html(classes='table table-striped sortable', index=False)
     mens_html = mens_df.to_html(classes='table table-striped sortable', index=False)
 
@@ -250,7 +247,7 @@ def team():
 
 @app.route('/namesearch', methods=['GET', 'POST'])
 def nameSearch():
-    """Handles both rendering and form submission for the Name Search page."""
+    """Handles both rendering and form submission for the Name Search page"""
     if request.method == 'POST':
         TARGET_NAME = request.form['TARGET_NAME']
         TARGET_COURSE = "Short Course (25m)"
@@ -261,10 +258,8 @@ def nameSearch():
             detail=f"name={TARGET_NAME},course={TARGET_COURSE}"
         )
 
-        # Call ProvideNameRankings to get filtered rankings
-        name_results = USPORTSDataManager.ProvideNameResults(TARGET_NAME, TARGET_COURSE)
+        name_results = data_manager.ProvideNameResults(TARGET_NAME, TARGET_COURSE)
 
-        # Convert rankings to a pandas DataFrame for better presentation
         rankings_df = pd.DataFrame(name_results, columns=['Name', 'Team', 'Event', 'Time', 'AQUA', 'Place', 'Score'])
 
         if rankings_df.empty:
@@ -316,13 +311,10 @@ def teamSearch():
             detail=f"team={TARGET_TEAM},course={TARGET_COURSE}"
         )
 
-        # Call ProvideIndividualRankings to get filtered rankings
-        team_results = USPORTSDataManager.ProvideTeamResults(TARGET_TEAM, TARGET_COURSE)
+        team_results = data_manager.ProvideTeamResults(TARGET_TEAM, TARGET_COURSE)
 
-        # Convert rankings to a pandas DataFrame for better presentation
         rankings_df = pd.DataFrame(team_results, columns=['Gender', 'Event', 'Place', 'Name', 'Time', 'AQUA', 'Score'])
 
-        # Convert the DataFrame to HTML
         rankings_html = rankings_df.to_html(classes='table table-striped sortable', index=False)
 
         return render_template(
@@ -515,12 +507,6 @@ def usage():
         .sort_values("hits", ascending=False)
     )
     ip_counts_html = ip_counts.to_html(classes="table table-striped", index=False)
-
-    # NOTE: For geographic location ("where they're from"), you'd need to
-    # run these IPs through a GeoIP service or database (e.g., ipinfo,
-    # MaxMind GeoLite2, etc.). That's external to this app and usually
-    # requires an API key or local DB, so here we just list the IPs +
-    # hit counts.
 
     # ---------------------------------------------------
     # 7) Full raw log dump as a table

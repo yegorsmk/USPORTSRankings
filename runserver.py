@@ -1,5 +1,5 @@
 """
-This script runs the FlaskTest application using a development server.
+runs the FlaskTest application using a development server
 """
 
 from os import environ
@@ -11,5 +11,4 @@ if __name__ == '__main__':
         PORT = int(environ.get('PORT', '5555'))
     except ValueError:
         PORT = 5555
-    #app.run(HOST, PORT)
     app.run('0.0.0.0', PORT)
