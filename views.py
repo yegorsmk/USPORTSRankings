@@ -39,6 +39,7 @@ TEAM_FULL_NAMES = {
     "ULAVAL": "Laval",
     "UOFL": "Lethbridge",
     "UM": "Manitoba",
+    "UNB": "New Brunswick",
     "MCGILL": "McGill",
     "MACU": "McMaster",
     "MUSC": "Memorial",
@@ -49,10 +50,12 @@ TEAM_FULL_NAMES = {
     "UOFR": "Regina",
     "USHER": "Sherbrooke",
     "UT": "Toronto",
+    "UG": "Guelph",
     "UBCT": "UBC",
     "UQTR": "UQTR",
     "UVIC": "Victoria",
     "WAT": "Waterloo",
+    "WES": "Western",
     "YU": "York",
 }
 
