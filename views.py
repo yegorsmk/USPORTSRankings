@@ -30,6 +30,32 @@ ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
 USAGE_PASSWORD = os.getenv("USAGE_PASSWORD")
 
+TEAM_FULL_NAMES = {
+    "BADGR": "Brock",
+    "UOFC": "Calgary",
+    "CAR": "Carleton",
+    "DAL": "Dalhousie",
+    "WLU": "Laurier",
+    "ULAVAL": "Laval",
+    "UOFL": "Lethbridge",
+    "UM": "Manitoba",
+    "MCGILL": "McGill",
+    "MACU": "McMaster",
+    "MUSC": "Memorial",
+    "UDEM": "Montréal",
+    "MTA": "Mount Allison",
+    "OTT": "Ottawa",
+    "QUE": "Queen's",
+    "UOFR": "Regina",
+    "USHER": "Sherbrooke",
+    "UT": "Toronto",
+    "UBCT": "UBC",
+    "UQTR": "UQTR",
+    "UVIC": "Victoria",
+    "WAT": "Waterloo",
+    "YU": "York",
+}
+
 def usage_auth_required():
     # Fail closed: if USAGE_PASSWORD is not set, nobody gets in
     return USAGE_PASSWORD is not None and request.args.get("pwd", "") == USAGE_PASSWORD
@@ -201,6 +227,10 @@ def team():
     # Convert to pandas DataFrame
     womens_df = pd.DataFrame(womens_team_rankings, columns=['Rank', 'Team', 'Score', 'Conference'])
     mens_df = pd.DataFrame(mens_team_rankings, columns=['Rank', 'Team', 'Score', 'Conference'])
+
+    # Replace team codes with full names
+    womens_df['Team'] = womens_df['Team'].map(TEAM_FULL_NAMES).fillna(womens_df['Team'])
+    mens_df['Team'] = mens_df['Team'].map(TEAM_FULL_NAMES).fillna(mens_df['Team'])
 
     # Convert DataFrame to HTML
     womens_html = womens_df.to_html(classes='table table-striped sortable', index=False)
