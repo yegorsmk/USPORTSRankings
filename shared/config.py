@@ -50,3 +50,7 @@ TEAM_BREAKDOWN_DB_FILENAME = OUTPUT_PREFIX + "team_breakdown_db.csv"
 WATCHLIST_FILENAME = OUTPUT_PREFIX + "watchlist.csv"
 
 USPORTS_SWIMMER_ID_DATABASE_FILENAME = OUTPUT_PREFIX + "USPORTSSwimmerIDDatabase.csv"   # Not currently used
+
+INELIGIBLE_SWIMMERS_IDS = {
+    "DOMMANN, Raben_2001-02-09 00:00:00", #UBC out of eligibility
+}

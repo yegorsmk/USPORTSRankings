@@ -24,7 +24,7 @@ load_dotenv()
 
 from datetime import date
 
-DATE_OF_LAST_UPDATE = "October 30, 2026"
+DATE_OF_LAST_UPDATE = "November 9, 2026"
 VERSION_NUMBER = "3.1 - WEEK 1"
 ANALYTICS_LOG = os.path.join(app.root_path, "usage_log.csv")
 
@@ -112,17 +112,6 @@ def home():
     return render_template(
         'index.html',
         title='Home',
-        year=datetime.now().year,
-        version=VERSION_NUMBER
-    )
-
-@app.route('/insights')
-def insights():
-    """Renders the insights page"""
-    log_event("page_view", "/insights")
-    return render_template(
-        'insights.html',
-        title='2025 U SPORTS Insights',
         year=datetime.now().year,
         version=VERSION_NUMBER
     )
@@ -487,10 +476,10 @@ def usage():
         psych_team_html = "<p>No team searches yet.</p>"
 
     # ---------------------------------------------------
-    # 5) Team / Insights / Usage pageviews
+    # 5) Team / Usage pageviews
     # ---------------------------------------------------
     pageviews = []
-    for route in ["/team", "/insights", "/usage"]:
+    for route in ["/team", "/usage"]:
         count = df[(df["event_type"] == "page_view") & (df["route"] == route)].shape[0]
         pageviews.append({"route": route, "pageviews": count})
 

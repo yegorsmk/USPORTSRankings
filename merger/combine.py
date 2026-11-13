@@ -5,7 +5,7 @@ keeping each athlete's fastest time per event under their varsity team.
 
 import csv
 
-from shared.config import RESULTS_DB_FILENAME, CLUB_RESULTS_DB_FILENAME, COMBINED_RESULTS_DB_FILENAME
+from shared.config import RESULTS_DB_FILENAME, CLUB_RESULTS_DB_FILENAME, COMBINED_RESULTS_DB_FILENAME, INELIGIBLE_SWIMMERS_IDS
 from shared.times import timeToSec
 from merger.manual_results import LoadManualResults
 
@@ -97,3 +97,10 @@ def SaveCombinedResults(varsity_header, combined_df):
         writer.writerows(combined_df)
 
     print(f"💾 Combined Results DB saved to {COMBINED_RESULTS_DB_FILENAME} ({len(combined_df)} rows)")
+
+def RemoveIneligibleAthletes(combined_df):
+    removed = [r for r in combined_df if r[0] in INELIGIBLE_SWIMMERS_IDS]
+    combined_df[:] = [r for r in combined_df if r[0] not in INELIGIBLE_SWIMMERS_IDS]
+    for athlete_id in sorted({r[0] for r in removed}):
+        print(f"🚫 Removed {athlete_id} (ineligible)")
+    print(f"Removed {len(removed)} swims by ineligible athletes")

@@ -5,7 +5,7 @@ This file was created on February 24th, 2026 to facilitate the Merge method of U
 
 from merger.varsity_results import GenerateResultsDatabase, SaveVarsityResults
 from merger.club_results import GenerateClubResultsDatabase
-from merger.combine import MergeVarsityAndClubResults, AddManualResults, SaveCombinedResults
+from merger.combine import MergeVarsityAndClubResults, AddManualResults, RemoveIneligibleAthletes, SaveCombinedResults
 from merger.event_scoring import ScoreAllSwims, SelectScoredSwims, RescoreSelectedSwims
 from merger.team_scoring import (
     LoadScoredSwims, AggregateTeamScores, SaveTeamRankings,
@@ -36,8 +36,11 @@ def main():
     AddManualResults(combined_df, athlete_to_varsity_team)
     print("Done Step 2.8/10")
 
+    ## Step 2.9 (Nov 10th, 2026): Remove ineligible athletes
+    RemoveIneligibleAthletes(combined_df)
+
     SaveCombinedResults(varsity_header, combined_df)
-    print("Done Step 2.75/10")
+    print("Done Step 2.9/10")
 
     ## Step 3: Rank and score every swim, then keep the swims that count
     ScoreAllSwims()

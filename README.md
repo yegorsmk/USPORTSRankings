@@ -72,7 +72,7 @@ This is the routine for each weekly (or so) update.
    ```
 5. **Check the site locally** with `python runserver.py`.
 6. **Archive this report** by copying `INPUT/` and the `OUTPUT_*` files into a dated folder, e.g. `2026-2027 Season/Nov 8th Report/`. Past seasons live in `Archive/`.
-7. **Deploy** from VS Code. See [Deploying to Azure](#deploying-to-azure).
+7. **Deploy** from VS Code.
 
 ---
 
@@ -121,7 +121,6 @@ Point tables, relay multipliers and limits are in [merger/scoring_rules.py](merg
 | `/psych` | Psych Sheets → By Event | Restricted rankings for one gender + event | `OUTPUT_restricted_event_scoring_db.csv` |
 | `/teamsearch` | Psych Sheets → By Team | All of one team's scoring swims | `OUTPUT_restricted_event_scoring_db.csv` |
 | `/team` | Team Scores | Men's and women's team standings | `OUTPUT_mens/womens_team_scoring_db.csv` |
-| `/insights` | 2025 U SPORTS Insights | Static write-up | – |
 | `/usage` | *(hidden)* | Visitor statistics. Needs `?pwd=<USAGE_PASSWORD>`. | `usage_log.csv` |
 | `/usage_log_download` | *(hidden)* | Downloads the raw usage log (same password) | `usage_log.csv` |
 
